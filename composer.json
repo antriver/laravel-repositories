@@ -1,0 +1,19 @@
+{
+    "name": "tmd/laravel-repositories",
+    "description": "Model repositories for Laravel 5.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Anthony Kuske",
+            "homepage": "http://www.anthonykuske.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Tmd\\LaravelModelRepositories\\": "src/"
+        }
+    },
+    "require": {
+        "laravel/framework": "^5.0"
+    }
+}
