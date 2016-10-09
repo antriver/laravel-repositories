@@ -51,7 +51,7 @@ abstract class AbstractCachedModelRepository extends AbstractModelRepository
      */
     protected function getKeyForFieldCacheKey($field, $value)
     {
-        return strtolower($this->getModelClassWithoutNamespace().'-'.$field).'-key:'.$value;
+        return strtolower($this->getModelClassWithoutNamespace().'-'.$field).'-key:'.strtolower($value);
     }
 
 
