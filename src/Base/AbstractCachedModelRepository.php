@@ -4,6 +4,9 @@ namespace Tmd\LaravelModelRepositories\Base;
 
 use Cache;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Tmd\LaravelModelRepositories\Events\ArrayCacheHit;
+use Tmd\LaravelModelRepositories\Events\ArrayCacheMissed;
+use Tmd\LaravelModelRepositories\Events\ArrayCacheWritten;
 
 abstract class AbstractCachedModelRepository extends AbstractModelRepository
 {
@@ -18,6 +21,11 @@ abstract class AbstractCachedModelRepository extends AbstractModelRepository
      * @var EloquentModel[]
      */
     protected $localCache = [];
+
+    /**
+     * @var bool
+     */
+    protected $fireLocalCacheEvents = false;
 
     /**
      * Return the unique string to use as the cache key for this model.
@@ -67,14 +75,22 @@ abstract class AbstractCachedModelRepository extends AbstractModelRepository
         $cacheKey = $this->getCacheKey($id);
 
         if ($this->useLocalCache && array_key_exists($cacheKey, $this->localCache)) {
+            if ($this->fireLocalCacheEvents) {
+                event(new ArrayCacheHit($cacheKey));
+            }
             $modelOrFalse = $this->localCache[$cacheKey];
 
             return $modelOrFalse ?: null;
+        } elseif ($this->useLocalCache && $this->fireLocalCacheEvents) {
+            event(new ArrayCacheMissed($cacheKey));
         }
 
         if (!is_null($modelOrFalse = Cache::get($cacheKey))) {
             if ($this->useLocalCache) {
                 $this->localCache[$cacheKey] = $modelOrFalse;
+                if ($this->fireLocalCacheEvents) {
+                    event(new ArrayCacheWritten($cacheKey));
+                }
             }
 
             return $modelOrFalse ?: null;
@@ -134,6 +150,9 @@ abstract class AbstractCachedModelRepository extends AbstractModelRepository
 
         if ($this->useLocalCache) {
             $this->localCache[$cacheKey] = $model ?: false;
+            if ($this->fireLocalCacheEvents) {
+                event(new ArrayCacheWritten($cacheKey));
+            }
         }
     }
 
