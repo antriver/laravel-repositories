@@ -26,7 +26,10 @@ abstract class AbstractCachedModelRepository extends AbstractModelRepository
      *
      * @return string
      */
-    abstract protected function getCacheKey($modelKey);
+    protected function getCacheKey($modelKey)
+    {
+        return strtolower($this->getModelClass()).':'.$modelKey;
+    }
 
     /**
      * Return the unique string to use to cache the primary key of a model looked up by a field.
@@ -38,7 +41,10 @@ abstract class AbstractCachedModelRepository extends AbstractModelRepository
      *
      * @return string|null
      */
-    abstract protected function getIdByFieldCacheKey($field, $value);
+    protected function getKeyForFieldCacheKey($field, $value)
+    {
+        return strtolower($this->getModelClass().'-'.$field).'-key:'.$value;
+    }
 
 
     /**
@@ -89,7 +95,7 @@ abstract class AbstractCachedModelRepository extends AbstractModelRepository
      */
     public function findBy($field, $value)
     {
-        $idCacheKey = $this->getIdByFieldCacheKey($field, $value);
+        $idCacheKey = $this->getKeyForFieldCacheKey($field, $value);
 
         // See if the id for the slug is already in the cache
         if ($idCacheKey && $id = Cache::get($idCacheKey)) {
