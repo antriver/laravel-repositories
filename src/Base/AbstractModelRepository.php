@@ -96,6 +96,13 @@ abstract class AbstractModelRepository implements RepositoryInterface
         return $class::all();
     }
 
+    protected function getModelClassWithoutNamespace()
+    {
+        $string = explode('\\', $this->getModelClass());
+
+        return array_pop($string);
+    }
+
     /**
      * @param string $field
      * @param string $value
