@@ -41,7 +41,9 @@ abstract class AbstractRepository implements RepositoryInterface
         if ($model = $this->queryModelByKey($key)) {
             return $model;
         }
-        $this->throwNotFoundException($this->getModelClass()->getKeyName(), $key);
+        
+        $class = $this->getModelClass();
+        $this->throwNotFoundException((new $class)->getKeyName(), $key);
 
         return null;
     }
