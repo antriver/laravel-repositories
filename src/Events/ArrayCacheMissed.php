@@ -1,6 +1,6 @@
 <?php
 
-namespace Tmd\LaravelModelRepositories\Events;
+namespace Tmd\LaravelRepositories\Events;
 
 class ArrayCacheMissed
 {

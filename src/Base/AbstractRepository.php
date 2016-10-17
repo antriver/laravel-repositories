@@ -1,11 +1,12 @@
 <?php
 
-namespace Tmd\LaravelModelRepositories\Base;
+namespace Tmd\LaravelRepositories\Base;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Tmd\LaravelRepositories\Interfaces\RepositoryInterface;
 
-abstract class AbstractModelRepository implements RepositoryInterface
+abstract class AbstractRepository implements RepositoryInterface
 {
     /**
      * Return the fully qualified class name of the Models this repository returns.
@@ -17,21 +18,19 @@ abstract class AbstractModelRepository implements RepositoryInterface
     /**
      * Return a model by its primary key.
      *
-     * @param int $key
+     * @param mixed $key
      *
      * @return EloquentModel|null
      */
     public function find($key)
     {
-        $class = $this->getModelClass();
-
-        return $class::find($key);
+        return $this->queryModelByKey($key);
     }
 
     /**
      * Return a model by its primary key. Throws an exception if not found.
      *
-     * @param int $key
+     * @param mixed $key
      *
      * @return EloquentModel|null
      *
@@ -39,7 +38,7 @@ abstract class AbstractModelRepository implements RepositoryInterface
      */
     public function findOrFail($key)
     {
-        if ($model = $this->find($key)) {
+        if ($model = $this->queryModelByKey($key)) {
             return $model;
         }
         $this->throwNotFoundException($this->getModelClass()->getKeyName(), $key);
@@ -58,25 +57,20 @@ abstract class AbstractModelRepository implements RepositoryInterface
      */
     public function findBy($field, $value)
     {
-        /** @var AbstractModelRepository $this */
-        $class = $this->getModelClass();
-
-        // Look up the model by slug
-        return $class::where($field, $value)->first();
+        return $this->queryModelByField($field, $value);
     }
 
     /**
      * Return a model by the value of a field. Throws an exception if not found.
      *
      * @param string $field
-     *
      * @param mixed  $value
      *
      * @return EloquentModel|null
      */
     public function findByOrFail($field, $value)
     {
-        if ($model = $this->findBy($field, $value)) {
+        if ($model = $this->queryModelByField($field, $value)) {
             return $model;
         }
         $this->throwNotFoundException($field, $value);
@@ -96,6 +90,34 @@ abstract class AbstractModelRepository implements RepositoryInterface
         return $class::all();
     }
 
+    /**
+     * @param mixed $key
+     *
+     * @return EloquentModel|null
+     */
+    protected function queryModelByKey($key)
+    {
+        $class = $this->getModelClass();
+
+        return $class::find($key);
+    }
+
+    /**
+     * @param string $field
+     * @param mixed  $value
+     *
+     * @return EloquentModel|null
+     */
+    protected function queryModelByField($field, $value)
+    {
+        $class = $this->getModelClass();
+
+        return $class::where($field, $value)->first();
+    }
+
+    /**
+     * @return string
+     */
     protected function getModelClassWithoutNamespace()
     {
         $string = explode('\\', $this->getModelClass());

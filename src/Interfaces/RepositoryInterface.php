@@ -1,6 +1,6 @@
 <?php
 
-namespace Tmd\LaravelModelRepositories\Base;
+namespace Tmd\LaravelRepositories\Interfaces;
 
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 

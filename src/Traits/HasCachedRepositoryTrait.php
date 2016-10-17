@@ -1,10 +1,10 @@
 <?php
 
-namespace Tmd\LaravelModelRepositories\Traits;
+namespace Tmd\LaravelRepositories\Traits;
 
 use ReflectionClass;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
-use Tmd\LaravelModelRepositories\Base\AbstractCachedModelRepository;
+use Tmd\LaravelRepositories\Base\AbstractCachedRepository;
 
 /**
  * Use this trait on a model to automatically refresh the cached copy when the model is updated or deleted.
@@ -23,13 +23,13 @@ trait HasCachedRepositoryTrait
                 $repository = app($repositoryName);
             }
 
-            // Clear cached slug if applicable
-            if ($repository instanceof AbstractCachedModelRepository) {
+            if ($repository instanceof AbstractCachedRepository) {
                 $repository->refresh($model->getKey());
                 $repository->forgetFieldKeys($model);
             }
         };
 
+        self::created($forgetInRepository);
         self::updated($forgetInRepository);
         self::deleted($forgetInRepository);
     }
