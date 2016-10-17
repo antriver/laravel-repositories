@@ -3,6 +3,7 @@
 namespace Tmd\LaravelRepositories\Traits;
 
 use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Tmd\LaravelRepositories\Base\AbstractRepository;
 
 /**
  * Implementation of SoftDeletableRepositoryInterface
@@ -18,6 +19,7 @@ trait SoftDeletableRepositoryTrait
      */
     public function findWithTrashed($key)
     {
+        /** @var AbstractRepository $this */
         $class = $this->getModelClass();
 
         return $class::withTrashed()->find($key);
@@ -32,6 +34,7 @@ trait SoftDeletableRepositoryTrait
      */
     public function findWithTrashedOrFail($key)
     {
+        /** @var AbstractRepository $this */
         $class = $this->getModelClass();
 
         return $class::withTrashed()->findOrFail($key);
@@ -46,6 +49,7 @@ trait SoftDeletableRepositoryTrait
      */
     public function findTrashed($key)
     {
+        /** @var AbstractRepository $this */
         $class = $this->getModelClass();
 
         return $class::onlyTrashed()->find($key);
@@ -60,6 +64,7 @@ trait SoftDeletableRepositoryTrait
      */
     public function findTrashedOrFail($key)
     {
+        /** @var AbstractRepository $this */
         $class = $this->getModelClass();
 
         return $class::onlyTrashed()->findOrFail($key);
