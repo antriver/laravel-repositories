@@ -101,7 +101,7 @@ abstract class AbstractRepository implements RepositoryInterface
     {
         $model->save();
 
-        return $this->find($model);
+        return $model->fresh();
     }
 
     /**
