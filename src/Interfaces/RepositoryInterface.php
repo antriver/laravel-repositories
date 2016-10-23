@@ -35,4 +35,11 @@ interface RepositoryInterface
      * @return EloquentModel|null
      */
     public function findByOrFail($field, $value);
+
+    /**
+     * @param EloquentModel $model
+     *
+     * @return EloquentModel
+     */
+    public function persist(EloquentModel $model);
 }

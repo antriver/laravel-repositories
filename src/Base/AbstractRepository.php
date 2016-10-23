@@ -41,7 +41,7 @@ abstract class AbstractRepository implements RepositoryInterface
         if ($model = $this->queryModelByKey($key)) {
             return $model;
         }
-        
+
         $class = $this->getModelClass();
         $this->throwNotFoundException((new $class)->getKeyName(), $key);
 
@@ -90,6 +90,18 @@ abstract class AbstractRepository implements RepositoryInterface
         $class = $this->getModelClass();
 
         return $class::all();
+    }
+
+    /**
+     * @param EloquentModel $model
+     *
+     * @return EloquentModel
+     */
+    public function persist(EloquentModel $model)
+    {
+        $model->save();
+
+        return $this->find($model);
     }
 
     /**

@@ -137,11 +137,27 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * Update the cached copy of a model.
      *
      * @param mixed $key
+     *
+     * @return EloquentModel|null
      */
     public function refresh($key)
     {
         $model = parent::find($key);
         $this->storeInCache($key, $model);
+
+        return $model;
+    }
+
+    /**
+     * @param EloquentModel $model
+     *
+     * @return EloquentModel
+     */
+    public function persist(EloquentModel $model)
+    {
+        $model->save();
+
+        return $this->refresh($model);
     }
 
     /**
