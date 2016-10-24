@@ -42,4 +42,11 @@ interface RepositoryInterface
      * @return EloquentModel
      */
     public function persist(EloquentModel $model);
+
+    /**
+     * @param EloquentModel $model
+     *
+     * @return bool
+     */
+    public function remove(EloquentModel $model);
 }

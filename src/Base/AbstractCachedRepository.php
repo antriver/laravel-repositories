@@ -116,11 +116,13 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      */
     public function forget($key)
     {
-        if (array_key_exists($key, $this->localCache)) {
-            unset($this->localCache[$key]);
+        $cacheKey = $this->getCacheKey($key);
+
+        if (array_key_exists($cacheKey, $this->localCache)) {
+            unset($this->localCache[$cacheKey]);
         }
 
-        return Cache::forget($this->getCacheKey($key));
+        return Cache::forget($cacheKey);
     }
 
     /**
@@ -163,6 +165,22 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         $this->storeInCache($model->getKey(), $model);
 
         return $model;
+    }
+
+    /**
+     * @param EloquentModel $model
+     *
+     * @return bool
+     */
+    public function remove(EloquentModel $model)
+    {
+        $result = parent::remove($model);
+        if ($result) {
+            $this->forgetFieldKeys($model);
+            $this->forget($model->getKey());
+        }
+
+        return $result;
     }
 
     /**

@@ -105,6 +105,16 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * @param EloquentModel $model
+     *
+     * @return bool
+     */
+    public function remove(EloquentModel $model)
+    {
+        return !!$model->delete();
+    }
+
+    /**
      * @param mixed $key
      *
      * @return EloquentModel|null
