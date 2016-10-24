@@ -159,7 +159,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
 
         /** @var EloquentModel $model */
         $model = $model->fresh();
-        
+
         $this->storeInCache($model->getKey(), $model);
 
         return $model;
