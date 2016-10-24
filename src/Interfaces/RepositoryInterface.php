@@ -26,7 +26,7 @@ interface RepositoryInterface
      *
      * @return EloquentModel|null
      */
-    public function findBy($field, $value);
+    public function findOneBy($field, $value);
 
     /**
      * @param string $field
@@ -34,7 +34,7 @@ interface RepositoryInterface
      *
      * @return EloquentModel|null
      */
-    public function findByOrFail($field, $value);
+    public function findOneByOrFail($field, $value);
 
     /**
      * @param EloquentModel $model

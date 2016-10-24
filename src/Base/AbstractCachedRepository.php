@@ -80,7 +80,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return EloquentModel|null
      */
-    public function findBy($field, $value)
+    public function findOneBy($field, $value)
     {
         // See if we already have the key for this field value cached.
         // If so, load it by key instead as the whole model may be cached that way.

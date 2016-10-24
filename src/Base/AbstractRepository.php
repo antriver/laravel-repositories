@@ -57,7 +57,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return EloquentModel|null
      */
-    public function findBy($field, $value)
+    public function findOneBy($field, $value)
     {
         return $this->queryModelByField($field, $value);
     }
@@ -70,7 +70,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return EloquentModel|null
      */
-    public function findByOrFail($field, $value)
+    public function findOneByOrFail($field, $value)
     {
         if ($model = $this->queryModelByField($field, $value)) {
             return $model;
