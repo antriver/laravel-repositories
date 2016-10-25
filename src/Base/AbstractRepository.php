@@ -99,9 +99,37 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function persist(EloquentModel $model)
     {
+        $oldWasRecentlyCreated = $model->wasRecentlyCreated;
+
         $model->save();
 
-        return $model->fresh();
+        $isNew = !$oldWasRecentlyCreated && $model->wasRecentlyCreated;
+
+        $freshModel = $model->fresh();
+
+        if ($isNew) {
+            $this->onInsert($model);
+        } else {
+            $this->onUpdate($model);
+        }
+
+        return $freshModel;
+    }
+
+    /**
+     * @param EloquentModel $model
+     */
+    protected function onInsert(EloquentModel $model)
+    {
+
+    }
+
+    /**
+     * @param EloquentModel $model
+     */
+    protected function onUpdate(EloquentModel $model)
+    {
+
     }
 
     /**
@@ -111,7 +139,21 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function remove(EloquentModel $model)
     {
-        return !!$model->delete();
+        $result = !!$model->delete();
+
+        if ($result) {
+            $this->onDelete($model);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param EloquentModel $model
+     */
+    protected function onDelete(EloquentModel $model)
+    {
+
     }
 
     /**
