@@ -95,13 +95,17 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param EloquentModel $model
      *
-     * @return EloquentModel
+     * @return bool|EloquentModel Returns false if not saved, or a fresh copy of the model if saved.
      */
     public function persist(EloquentModel $model)
     {
         $oldWasRecentlyCreated = $model->wasRecentlyCreated;
 
-        $model->save();
+        $saved = $model->save();
+
+        if (!$saved) {
+            return false;
+        }
 
         $isNew = !$oldWasRecentlyCreated && $model->wasRecentlyCreated;
 
