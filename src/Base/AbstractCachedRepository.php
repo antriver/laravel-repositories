@@ -183,7 +183,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         return $result;
     }
 
-    public function increment(EloquentModel $model, $column, $amount)
+    public function increment(EloquentModel $model, $column, $amount = 1)
     {
         $this->incrementOrDecrement($model, $column, $amount);
 

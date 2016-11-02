@@ -140,18 +140,18 @@ abstract class AbstractRepository implements RepositoryInterface
         return $result;
     }
 
-    public function increment(EloquentModel $model, $column, $amount)
+    public function increment(EloquentModel $model, $column, $amount = 1)
     {
         $this->incrementOrDecrement($model, $column, $amount);
         return $this->find($model->getKey());
     }
 
-    public function decrement(EloquentModel $model, $column, $amount)
+    public function decrement(EloquentModel $model, $column, $amount = 1)
     {
         return $this->increment($model, $column, -$amount);
     }
 
-    protected function incrementOrDecrement(EloquentModel $model, $column, $amount)
+    protected function incrementOrDecrement(EloquentModel $model, $column, $amount = 1)
     {
         $amount = (int)$amount;
 
