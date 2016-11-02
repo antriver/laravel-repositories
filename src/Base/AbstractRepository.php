@@ -110,7 +110,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
         $isNew = !$oldWasRecentlyCreated && $model->wasRecentlyCreated;
 
-        $freshModel = $model->fresh();
+        $freshModel = $this->fresh($model);
 
         if ($isNew) {
             $this->onInsert($model);
@@ -121,6 +121,18 @@ abstract class AbstractRepository implements RepositoryInterface
         $this->onChange($model);
 
         return $freshModel;
+    }
+
+    /**
+     * Reload a fresh model instance from the database.
+     *
+     * @param EloquentModel $model
+     *
+     * @return EloquentModel|null
+     */
+    protected function fresh(EloquentModel $model)
+    {
+        return $model->fresh();
     }
 
     /**
