@@ -2,6 +2,7 @@
 
 namespace Tmd\LaravelRepositories\Base;
 
+use DB;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tmd\LaravelRepositories\Interfaces\RepositoryInterface;
@@ -123,37 +124,6 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * Called when a model is saved for he first time.
-     *
-     * @param EloquentModel $model
-     */
-    protected function onInsert(EloquentModel $model)
-    {
-
-    }
-
-    /**
-     * Called when an existing model is updated.
-     *
-     * @param EloquentModel $model
-     */
-    protected function onUpdate(EloquentModel $model)
-    {
-
-    }
-
-    /**
-     * Called when the model is inserted, updated, or deleted.
-     * (AFTER the onInsert/onUpdate/onDelete methods are called.)
-     *
-     * @param EloquentModel $model
-     */
-    protected function onChange(EloquentModel $model)
-    {
-
-    }
-
-    /**
      * @param EloquentModel $model
      *
      * @return bool
@@ -170,14 +140,26 @@ abstract class AbstractRepository implements RepositoryInterface
         return $result;
     }
 
-    /**
-     * Called when a model is deleted.
-     *
-     * @param EloquentModel $model
-     */
-    protected function onDelete(EloquentModel $model)
+    public function increment(EloquentModel $model, $column, $amount)
     {
+        $this->incrementOrDecrement($model, $column, $amount);
+        return $this->find($model->getKey());
+    }
 
+    public function decrement(EloquentModel $model, $column, $amount)
+    {
+        return $this->increment($model, $column, -$amount);
+    }
+
+    protected function incrementOrDecrement(EloquentModel $model, $column, $amount)
+    {
+        $amount = (int)$amount;
+
+        $query = "UPDATE `{$model->getTable()}`
+        SET `{$column}` = `{$column}` + {$amount}
+        WHERE `{$model->getKeyName()}` = ?";
+
+        return DB::affectingStatement($query, [$model->getKey()]);
     }
 
     /**
@@ -213,6 +195,47 @@ abstract class AbstractRepository implements RepositoryInterface
         $string = explode('\\', $this->getModelClass());
 
         return array_pop($string);
+    }
+
+    /**
+     * Called when a model is saved for he first time.
+     *
+     * @param EloquentModel $model
+     */
+    protected function onInsert(EloquentModel $model)
+    {
+
+    }
+
+    /**
+     * Called when an existing model is updated.
+     *
+     * @param EloquentModel $model
+     */
+    protected function onUpdate(EloquentModel $model)
+    {
+
+    }
+
+    /**
+     * Called when a model is deleted.
+     *
+     * @param EloquentModel $model
+     */
+    protected function onDelete(EloquentModel $model)
+    {
+
+    }
+
+    /**
+     * Called when the model is inserted, updated, or deleted.
+     * (AFTER the onInsert/onUpdate/onDelete methods are called.)
+     *
+     * @param EloquentModel $model
+     */
+    protected function onChange(EloquentModel $model)
+    {
+
     }
 
     /**

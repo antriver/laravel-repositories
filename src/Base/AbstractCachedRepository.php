@@ -183,6 +183,13 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         return $result;
     }
 
+    public function increment(EloquentModel $model, $column, $amount)
+    {
+        $this->incrementOrDecrement($model, $column, $amount);
+
+        return $this->refresh($model->getKey());
+    }
+
     /**
      * Store a model (or remember its lack of existence) in the cache.
      *
