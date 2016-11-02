@@ -113,10 +113,14 @@ abstract class AbstractRepository implements RepositoryInterface
             $this->onUpdate($model);
         }
 
+        $this->onChange($model);
+
         return $freshModel;
     }
 
     /**
+     * Called when a model is saved for he first time.
+     *
      * @param EloquentModel $model
      */
     protected function onInsert(EloquentModel $model)
@@ -125,9 +129,22 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
+     * Called when an existing model is updated.
+     *
      * @param EloquentModel $model
      */
     protected function onUpdate(EloquentModel $model)
+    {
+
+    }
+
+    /**
+     * Called when the model is inserted, updated, or deleted.
+     * (AFTER the onInsert/onUpdate/onDelete methods are called.)
+     *
+     * @param EloquentModel $model
+     */
+    protected function onChange(EloquentModel $model)
     {
 
     }
@@ -143,12 +160,15 @@ abstract class AbstractRepository implements RepositoryInterface
 
         if ($result) {
             $this->onDelete($model);
+            $this->onChange($model);
         }
 
         return $result;
     }
 
     /**
+     * Called when a model is deleted.
+     *
      * @param EloquentModel $model
      */
     protected function onDelete(EloquentModel $model)
