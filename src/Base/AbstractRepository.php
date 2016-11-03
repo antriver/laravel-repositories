@@ -126,7 +126,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return EloquentModel|null
      */
-    protected function fresh(EloquentModel $model)
+    public function fresh(EloquentModel $model)
     {
         return $model->fresh();
     }
