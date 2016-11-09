@@ -101,6 +101,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function persist(EloquentModel $model)
     {
         $oldWasRecentlyCreated = $model->wasRecentlyCreated;
+        $dirtyAttibutes = $model->getDirty();
 
         if (!$model->save()) {
             return false;
@@ -111,10 +112,10 @@ abstract class AbstractRepository implements RepositoryInterface
         if ($isNew) {
             $this->onInsert($model);
         } else {
-            $this->onUpdate($model);
+            $this->onUpdate($model, $dirtyAttibutes);
         }
 
-        $this->onChange($model);
+        $this->onChange($model, $dirtyAttibutes);
 
         return true;
     }
@@ -219,8 +220,9 @@ abstract class AbstractRepository implements RepositoryInterface
      * Called when an existing model is updated.
      *
      * @param EloquentModel $model
+     * @param array $dirtyAttributes
      */
-    protected function onUpdate(EloquentModel $model)
+    protected function onUpdate(EloquentModel $model, array $dirtyAttributes = null)
     {
 
     }
@@ -240,8 +242,9 @@ abstract class AbstractRepository implements RepositoryInterface
      * (AFTER the onInsert/onUpdate/onDelete methods are called.)
      *
      * @param EloquentModel $model
+     * @param array $dirtyAttributes
      */
-    protected function onChange(EloquentModel $model)
+    protected function onChange(EloquentModel $model, array $dirtyAttributes = null)
     {
 
     }
