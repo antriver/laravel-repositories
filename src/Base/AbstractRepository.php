@@ -73,7 +73,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function findOneByOrFail($field, $value)
     {
-        if ($model = $this->queryModelByField($field, $value)) {
+        if ($model = $this->findOneBy($field, $value)) {
             return $model;
         }
         $this->throwNotFoundException($field, $value);
@@ -101,7 +101,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function persist(EloquentModel $model)
     {
         $oldWasRecentlyCreated = $model->wasRecentlyCreated;
-        $dirtyAttibutes = $model->getDirty();
+        $dirtyAttributes = $model->getDirty();
 
         if (!$model->save()) {
             return false;
@@ -112,10 +112,10 @@ abstract class AbstractRepository implements RepositoryInterface
         if ($isNew) {
             $this->onInsert($model);
         } else {
-            $this->onUpdate($model, $dirtyAttibutes);
+            $this->onUpdate($model, $dirtyAttributes);
         }
 
-        $this->onChange($model, $dirtyAttibutes);
+        $this->onChange($model, $dirtyAttributes);
 
         return true;
     }
@@ -207,7 +207,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * Called when a model is saved for he first time.
+     * Called when a model is saved for the first time.
      *
      * @param EloquentModel $model
      */
@@ -238,8 +238,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * Called when the model is inserted, updated, or deleted.
-     * (AFTER the onInsert/onUpdate/onDelete methods are called.)
+     * Called when the model is inserted, updated, or deleted. After the onInsert/onUpdate/onDelete methods are called.
      *
      * @param EloquentModel $model
      * @param array $dirtyAttributes
