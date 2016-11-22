@@ -3,6 +3,7 @@
 namespace Tmd\LaravelRepositories\Base;
 
 use Cache;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Tmd\LaravelRepositories\Events\ArrayCacheHit;
 use Tmd\LaravelRepositories\Events\ArrayCacheMissed;
@@ -27,6 +28,20 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * @var bool
      */
     protected $fireLocalCacheEvents = false;
+
+    /**
+     * @var Store
+     */
+    protected $cache = null;
+
+    public function __construct(Store $cache = null)
+    {
+        if ($cache) {
+            $this->cache = $cache;
+        } else {
+            $this->cache = \Cache::getStore();
+        }
+    }
 
     /**
      * Returns a single model by its ID.
@@ -56,7 +71,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
             event(new ArrayCacheMissed($cacheKey));
         }
 
-        if (!is_null($modelOrFalse = Cache::get($cacheKey))) {
+        if (!is_null($modelOrFalse = $this->cache->get($cacheKey))) {
             if ($this->useLocalCache) {
                 $this->localCache[$cacheKey] = $modelOrFalse;
                 if ($this->fireLocalCacheEvents) {
@@ -67,7 +82,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
             return $modelOrFalse ?: null;
         }
 
-        $model = $this->queryModelByKey($key);
+        $model = $this->queryDatabaseForModelByKey($key);
 
         $this->storeInCache($key, $model);
 
@@ -85,12 +100,12 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         // See if we already have the key for this field value cached.
         // If so, load it by key instead as the whole model may be cached that way.
         $idCacheKey = $this->getKeyForFieldCacheKey($field, $value);
-        if ($idCacheKey && $id = Cache::get($idCacheKey)) {
+        if ($idCacheKey && $id = $this->cache->get($idCacheKey)) {
             // Sweet, we know the key - look up the model using that.
             return $this->find($id);
         }
 
-        $model = $this->queryModelByField($field, $value);
+        $model = $this->queryDatabaseForModelByField($field, $value);
 
         // No result
         if (!$model) {
@@ -101,7 +116,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         $this->storeInCache($model->getKey(), $model);
 
         // And remember the key for the field value
-        Cache::forever($idCacheKey, $model->getKey());
+        $this->cache->forever($idCacheKey, $model->getKey());
 
         return $model;
     }
@@ -122,7 +137,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
             unset($this->localCache[$cacheKey]);
         }
 
-        return Cache::forget($cacheKey);
+        return $this->cache->forget($cacheKey);
     }
 
     /**
@@ -182,19 +197,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         return $result;
     }
 
-    public function increment(EloquentModel $model, $column, $amount = 1)
+    public function incrementOrDecrement(EloquentModel $model, $column, $amount = 1)
     {
-        $this->incrementOrDecrement($model, $column, $amount);
+        parent::incrementOrDecrement($model, $column, $amount);
 
         return $this->refresh($model->getKey());
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isUseLocalCache()
-    {
-        return $this->useLocalCache;
     }
 
     /**
@@ -215,7 +222,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     {
         $cacheKey = $this->getCacheKey($key);
 
-        Cache::forever($cacheKey, $model ?: false);
+        $this->cache->forever($cacheKey, $model ?: false);
 
         if ($this->useLocalCache) {
             $this->localCache[$cacheKey] = $model ?: false;

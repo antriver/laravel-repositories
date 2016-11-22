@@ -2,9 +2,10 @@
 
 namespace Tmd\LaravelRepositories\Base;
 
+use Closure;
 use DB;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Tmd\LaravelRepositories\Interfaces\RepositoryInterface;
 
 abstract class AbstractRepository implements RepositoryInterface
@@ -12,9 +13,49 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Return the fully qualified class name of the Models this repository returns.
      *
-     * @return EloquentModel|string|\Illuminate\Database\Eloquent\Builder
+     * @return string
      */
     abstract public function getModelClass();
+
+    /**
+     * @var Closure|null
+     */
+    public $inserted = null;
+
+    /**
+     * @var Closure|null
+     */
+    public $updated = null;
+
+    /**
+     * @var Closure|null
+     */
+    public $deleted = null;
+
+    /**
+     * @var Closure|null
+     */
+    public $changed = null;
+
+    /**
+     * @return EloquentModel
+     */
+    protected function getModelInstance()
+    {
+        $class = $this->getModelClass();
+
+        return new $class;
+    }
+
+    /**
+     * Return all of this model.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|EloquentModel[]
+     */
+    public function all()
+    {
+        return $this->getModelInstance()->all();
+    }
 
     /**
      * Return a model by its primary key.
@@ -25,7 +66,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function find($key)
     {
-        return $this->queryModelByKey($key);
+        return $this->queryDatabaseForModelByKey($key);
     }
 
     /**
@@ -35,18 +76,15 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return EloquentModel|null
      *
-     * @throws NotFoundHttpException
+     * @throws ModelNotFoundException
      */
     public function findOrFail($key)
     {
-        if ($model = $this->queryModelByKey($key)) {
+        if ($model = $this->queryDatabaseForModelByKey($key)) {
             return $model;
         }
 
-        $class = $this->getModelClass();
-        $this->throwNotFoundException((new $class)->getKeyName(), $key);
-
-        return null;
+        throw $this->createNotFoundException($this->getModelInstance()->getKeyName(), $key);
     }
 
     /**
@@ -60,7 +98,7 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function findOneBy($field, $value)
     {
-        return $this->queryModelByField($field, $value);
+        return $this->queryDatabaseForModelByField($field, $value);
     }
 
     /**
@@ -70,27 +108,46 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param mixed  $value
      *
      * @return EloquentModel|null
+     *
+     * @throws ModelNotFoundException
      */
     public function findOneByOrFail($field, $value)
     {
         if ($model = $this->findOneBy($field, $value)) {
             return $model;
         }
-        $this->throwNotFoundException($field, $value);
-
-        return null;
+        throw $this->createNotFoundException($field, $value);
     }
 
     /**
-     * Return all of this model.
+     * @param mixed $key
      *
-     * @return \Illuminate\Database\Eloquent\Collection|EloquentModel[]
+     * @return EloquentModel|null
      */
-    public function all()
+    protected function queryDatabaseForModelByKey($key)
     {
-        $class = $this->getModelClass();
+        return $this->getModelInstance()->newQuery()->find($key);
+    }
 
-        return $class::all();
+    /**
+     * @param string $field
+     * @param mixed  $value
+     *
+     * @return EloquentModel|null
+     */
+    protected function queryDatabaseForModelByField($field, $value)
+    {
+        return $this->getModelInstance()->newQuery()->where($field, $value)->first();
+    }
+
+    /**
+     * @return string
+     */
+    public function getModelClassWithoutNamespace()
+    {
+        $string = explode('\\', $this->getModelClass());
+
+        return array_pop($string);
     }
 
     /**
@@ -101,7 +158,12 @@ abstract class AbstractRepository implements RepositoryInterface
     public function persist(EloquentModel $model)
     {
         $oldWasRecentlyCreated = $model->wasRecentlyCreated;
+
         $dirtyAttributes = $model->getDirty();
+        $originalAttributes = [];
+        foreach ($dirtyAttributes as $key => $newValue) {
+            $originalAttributes[$key] = $model->getOriginal($key);
+        }
 
         if (!$model->save()) {
             return false;
@@ -109,13 +171,14 @@ abstract class AbstractRepository implements RepositoryInterface
 
         $isNew = !$oldWasRecentlyCreated && $model->wasRecentlyCreated;
 
+
         if ($isNew) {
             $this->onInsert($model);
         } else {
-            $this->onUpdate($model, $dirtyAttributes);
+            $this->onUpdate($model, $originalAttributes);
         }
 
-        $this->onChange($model, $dirtyAttributes);
+        $this->onChange($model, $originalAttributes);
 
         return true;
     }
@@ -152,6 +215,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function increment(EloquentModel $model, $column, $amount = 1)
     {
         $this->incrementOrDecrement($model, $column, $amount);
+
         return $this->find($model->getKey());
     }
 
@@ -172,59 +236,28 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @param mixed $key
-     *
-     * @return EloquentModel|null
-     */
-    protected function queryModelByKey($key)
-    {
-        $class = $this->getModelClass();
-
-        return $class::find($key);
-    }
-
-    /**
-     * @param string $field
-     * @param mixed  $value
-     *
-     * @return EloquentModel|null
-     */
-    protected function queryModelByField($field, $value)
-    {
-        $class = $this->getModelClass();
-
-        return $class::where($field, $value)->first();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getModelClassWithoutNamespace()
-    {
-        $string = explode('\\', $this->getModelClass());
-
-        return array_pop($string);
-    }
-
-    /**
      * Called when a model is saved for the first time.
      *
      * @param EloquentModel $model
      */
     protected function onInsert(EloquentModel $model)
     {
-
+        if ($this->inserted instanceof Closure) {
+            call_user_func($this->inserted, $model);
+        }
     }
 
     /**
      * Called when an existing model is updated.
      *
      * @param EloquentModel $model
-     * @param array $dirtyAttributes
+     * @param array         $dirtyAttributes Array of attributes that were changed, and their previous value.
      */
     protected function onUpdate(EloquentModel $model, array $dirtyAttributes = null)
     {
-
+        if ($this->updated instanceof Closure) {
+            call_user_func($this->updated, $model, $dirtyAttributes);
+        }
     }
 
     /**
@@ -234,30 +267,37 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     protected function onDelete(EloquentModel $model)
     {
-
+        if ($this->deleted instanceof Closure) {
+            call_user_func($this->deleted, $model);
+        }
     }
 
     /**
      * Called when the model is inserted, updated, or deleted. After the onInsert/onUpdate/onDelete methods are called.
      *
      * @param EloquentModel $model
-     * @param array $dirtyAttributes
+     * @param array         $dirtyAttributes Array of attributes that were changed, and their previous value.
      */
     protected function onChange(EloquentModel $model, array $dirtyAttributes = null)
     {
-
+        if ($this->changed instanceof Closure) {
+            call_user_func($this->changed, $model, $dirtyAttributes);
+        }
     }
 
     /**
      * @param string $field
      * @param string $value
      * @param string $message
+     *
+     * @return ModelNotFoundException
      */
-    protected function throwNotFoundException($field, $value, $message = null)
+    protected function createNotFoundException($field, $value, $message = null)
     {
         if (!$message) {
             $message = "{$this->getModelClass()} with {$field} {$value} not found.";
         }
-        throw new NotFoundHttpException($message);
+
+        return new ModelNotFoundException($message, 404);
     }
 }
