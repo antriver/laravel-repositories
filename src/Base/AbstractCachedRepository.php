@@ -190,6 +190,22 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     }
 
     /**
+     * @return boolean
+     */
+    public function isUseLocalCache()
+    {
+        return $this->useLocalCache;
+    }
+
+    /**
+     * @param boolean $useLocalCache
+     */
+    public function setUseLocalCache($useLocalCache)
+    {
+        $this->useLocalCache = !!$useLocalCache;
+    }
+
+    /**
      * Store a model (or remember its lack of existence) in the cache.
      *
      * @param mixed              $key
