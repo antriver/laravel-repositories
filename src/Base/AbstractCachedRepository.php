@@ -17,7 +17,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @var bool
      */
-    protected $useLocalCache = true;
+    protected $useLocalCache = false;
 
     /**
      * @var EloquentModel[]
