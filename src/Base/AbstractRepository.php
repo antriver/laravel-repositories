@@ -232,7 +232,12 @@ abstract class AbstractRepository implements RepositoryInterface
         SET `{$column}` = `{$column}` + {$amount}
         WHERE `{$model->getKeyName()}` = ?";
 
-        return DB::affectingStatement($query, [$model->getKey()]);
+        $result = DB::affectingStatement($query, [$model->getKey()]);
+
+        $this->onUpdate($model);
+        $this->onChange($model);
+
+        return $result;
     }
 
     /**
