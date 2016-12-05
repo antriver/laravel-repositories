@@ -84,7 +84,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
 
         $model = $this->queryDatabaseForModelByKey($key);
 
-        $this->storeInCache($key, $model);
+        $this->remember($model);
 
         return $model ?: null;
     }
@@ -113,7 +113,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         }
 
         // Remember the model itself (by key)
-        $this->storeInCache($model->getKey(), $model);
+        $this->remember($model);
 
         // And remember the key for the field value
         $this->cache->forever($idCacheKey, $model->getKey());
@@ -141,6 +141,16 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     }
 
     /**
+     * Store the given model in the cache.
+     *
+     * @param EloquentModel $model
+     */
+    public function remember(EloquentModel $model)
+    {
+        $this->storeInCache($model->getKey(), $model);
+    }
+
+    /**
      * Override this method to forget the cached values of $this->getKeyForFieldCacheKey if used.
      *
      * @param EloquentModel $model
@@ -160,7 +170,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     public function refresh($key)
     {
         $model = parent::find($key);
-        $this->storeInCache($key, $model);
+        $this->remember($model);
 
         return $model;
     }
@@ -168,12 +178,12 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     /**
      * @param EloquentModel $model
      *
-     * @return EloquentModel
+     * @return bool
      */
     public function persist(EloquentModel $model)
     {
         if (parent::persist($model)) {
-            $this->storeInCache($model->getKey(), $model);
+            $this->remember($this->fresh($model));
 
             return true;
         }
