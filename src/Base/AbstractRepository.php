@@ -226,6 +226,10 @@ abstract class AbstractRepository implements RepositoryInterface
 
     protected function incrementOrDecrement(EloquentModel $model, $column, $amount = 1)
     {
+        $originalAttributes = [
+            $column => $model->{$column}
+        ];
+
         $amount = (int)$amount;
 
         $query = "UPDATE `{$model->getTable()}`
@@ -234,8 +238,8 @@ abstract class AbstractRepository implements RepositoryInterface
 
         $result = DB::affectingStatement($query, [$model->getKey()]);
 
-        $this->onUpdate($model);
-        $this->onChange($model);
+        $this->onUpdate($model, $originalAttributes);
+        $this->onChange($model, $originalAttributes);
 
         return $result;
     }
