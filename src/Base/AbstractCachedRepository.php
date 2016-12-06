@@ -84,7 +84,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
 
         $model = $this->queryDatabaseForModelByKey($key);
 
-        $this->remember($model ?: false);
+        $this->storeInCache($key, $model);
 
         return $model ?: null;
     }
