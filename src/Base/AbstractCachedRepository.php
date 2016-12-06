@@ -84,7 +84,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
 
         $model = $this->queryDatabaseForModelByKey($key);
 
-        $this->remember($model);
+        $this->remember($model ?: false);
 
         return $model ?: null;
     }
@@ -143,9 +143,9 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     /**
      * Store the given model in the cache.
      *
-     * @param EloquentModel $model
+     * @param EloquentModel|false $model
      */
-    public function remember(EloquentModel $model)
+    public function remember($model)
     {
         $this->storeInCache($model->getKey(), $model);
     }
