@@ -241,6 +241,8 @@ abstract class AbstractRepository implements RepositoryInterface
         $this->onUpdate($model, $originalAttributes);
         $this->onChange($model, $originalAttributes);
 
+        $model->{$column} += $amount;
+
         return $result;
     }
 
