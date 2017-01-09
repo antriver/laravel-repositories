@@ -97,6 +97,14 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      */
     public function findOneBy($field, $value)
     {
+        if (empty($field)) {
+            throw new \Exception("A field must be specified.");
+        }
+
+        if (empty($value)) {
+            return null;
+        }
+
         // See if we already have the key for this field value cached.
         // If so, load it by key instead as the whole model may be cached that way.
         $idCacheKey = $this->getKeyForFieldCacheKey($field, $value);

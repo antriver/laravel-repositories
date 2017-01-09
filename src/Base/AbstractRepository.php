@@ -66,6 +66,10 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function find($key)
     {
+        if (empty($key)) {
+            return null;
+        }
+
         return $this->queryDatabaseForModelByKey($key);
     }
 
@@ -91,13 +95,21 @@ abstract class AbstractRepository implements RepositoryInterface
      * Return a model by the value of a field.
      *
      * @param string $field
-     *
      * @param mixed  $value
      *
      * @return EloquentModel|null
+     * @throws \Exception
      */
     public function findOneBy($field, $value)
     {
+        if (empty($field)) {
+            throw new \Exception("A field must be specified.");
+        }
+
+        if (empty($value)) {
+            return null;
+        }
+
         return $this->queryDatabaseForModelByField($field, $value);
     }
 
