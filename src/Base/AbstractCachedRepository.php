@@ -94,6 +94,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * @param mixed  $value
      *
      * @return EloquentModel|null
+     * @throws \Exception
      */
     public function findOneBy($field, $value)
     {
