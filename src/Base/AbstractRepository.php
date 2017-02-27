@@ -21,7 +21,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return EloquentModel
      */
-    protected function create()
+    public function create()
     {
         $class = $this->getModelClass();
 
