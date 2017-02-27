@@ -5,48 +5,32 @@ namespace Tmd\LaravelRepositories\Base;
 use Cache;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
-use Tmd\LaravelRepositories\Events\ArrayCacheHit;
-use Tmd\LaravelRepositories\Events\ArrayCacheMissed;
-use Tmd\LaravelRepositories\Events\ArrayCacheWritten;
 use Tmd\LaravelRepositories\Interfaces\CachedRepositoryInterface;
 
 abstract class AbstractCachedRepository extends AbstractRepository implements CachedRepositoryInterface
 {
     /**
-     * Once we've loaded an item from the cache or database, remember it in an array in the repository?
-     *
-     * @var bool
-     */
-    protected $useLocalCache = false;
-
-    /**
-     * @var EloquentModel[]
-     */
-    protected $localCache = [];
-
-    /**
-     * @var bool
-     */
-    protected $fireLocalCacheEvents = false;
-
-    /**
      * @var Store
      */
     protected $cache = null;
 
+    /**
+     * @param Store|null $cache
+     */
     public function __construct(Store $cache = null)
     {
         if ($cache) {
             $this->cache = $cache;
         } else {
-            $this->cache = \Cache::getStore();
+            // Use the default cache store.
+            $this->cache = Cache::getStore();
         }
     }
 
     /**
-     * Returns a single model by its ID.
-     * If the model is not found, a boolean false is cached to remember that it does not exist. But the method will
-     * always return a model or null.
+     * Return a model by its primary key.
+     * If the model is not found, 'false' is cached to remember that it does not exist.
+     * But the method will always return a model or null.
      *
      * @param mixed $key
      *
@@ -60,26 +44,9 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
 
         $cacheKey = $this->getCacheKey($key);
 
-        if ($this->useLocalCache && array_key_exists($cacheKey, $this->localCache)) {
-            if ($this->fireLocalCacheEvents) {
-                event(new ArrayCacheHit($cacheKey));
-            }
-            $modelOrFalse = $this->localCache[$cacheKey];
-
-            return $modelOrFalse ?: null;
-        } elseif ($this->useLocalCache && $this->fireLocalCacheEvents) {
-            event(new ArrayCacheMissed($cacheKey));
-        }
-
-        if (!is_null($modelOrFalse = $this->cache->get($cacheKey))) {
-            if ($this->useLocalCache) {
-                $this->localCache[$cacheKey] = $modelOrFalse;
-                if ($this->fireLocalCacheEvents) {
-                    event(new ArrayCacheWritten($cacheKey));
-                }
-            }
-
-            return $modelOrFalse ?: null;
+        $modelOrFalse = $this->cache->get($cacheKey);
+        if ($modelOrFalse !== null) {
+            return $modelOrFalse === false ? null : $modelOrFalse;
         }
 
         $model = $this->queryDatabaseForModelByKey($key);
@@ -224,14 +191,6 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     }
 
     /**
-     * @param boolean $useLocalCache
-     */
-    public function setUseLocalCache($useLocalCache)
-    {
-        $this->useLocalCache = !!$useLocalCache;
-    }
-
-    /**
      * Store a model (or remember its lack of existence) in the cache.
      *
      * @param mixed              $key
@@ -242,13 +201,6 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         $cacheKey = $this->getCacheKey($key);
 
         $this->cache->forever($cacheKey, $model ?: false);
-
-        if ($this->useLocalCache) {
-            $this->localCache[$cacheKey] = $model ?: false;
-            if ($this->fireLocalCacheEvents) {
-                event(new ArrayCacheWritten($cacheKey));
-            }
-        }
     }
 
     /**

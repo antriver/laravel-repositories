@@ -401,10 +401,10 @@ class AbstractRepositoryTest extends TestCase
         $this->assertNull($changedAttributes);
     }
 
-    public function testGetModelClassWithoutNamespace()
+    /*public function testGetModelClassWithoutNamespace()
     {
         $repository = $this->getRepository();
 
         $this->assertSame('Post', $repository->getModelClassWithoutNamespace());
-    }
+    }*/
 }
