@@ -109,10 +109,6 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     {
         $cacheKey = $this->getCacheKey($key);
 
-        if (array_key_exists($cacheKey, $this->localCache)) {
-            unset($this->localCache[$cacheKey]);
-        }
-
         return $this->cache->forget($cacheKey);
     }
 
