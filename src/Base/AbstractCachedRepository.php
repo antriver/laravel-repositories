@@ -124,6 +124,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
 
     /**
      * Override this method to forget the cached values of $this->getKeyForFieldCacheKey if used.
+     * This is called when removing (deleting) a model.
      *
      * @param EloquentModel $model
      */
@@ -161,6 +162,15 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         }
 
         return false;
+    }
+
+    public function fresh(EloquentModel $model)
+    {
+        $model = parent::fresh($model);
+
+        $this->remember($model);
+
+        return $model;
     }
 
     /**
