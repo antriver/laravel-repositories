@@ -2,43 +2,83 @@
 
 namespace Tmd\LaravelRepositories\Interfaces;
 
-use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Illuminate\Database\Eloquent\Model;
 
 interface SoftDeletableRepositoryInterface
 {
     /**
-     * Return a model that MAY be soft deleted.
+     * Return a model by its primary key that MAY be soft deleted.
      *
-     * @param mixed $key
+     * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    public function findWithTrashed($key);
+    public function findWithTrashed($modelId);
 
     /**
-     * Return a model that MAY be soft deleted or throw an Exception.
+     * Return a model by its primary key that MAY be soft deleted or throw an exception if not found.
      *
-     * @param mixed $key
+     * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model
      */
-    public function findWithTrashedOrFail($key);
+    public function findWithTrashedOrFail($modelId): Model;
 
     /**
-     * Return a model that MUST be soft deleted.
+     * Return a model by its primary key that MUST be soft deleted.
      *
-     * @param mixed $key
+     * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    public function findTrashed($key);
+    public function findTrashed($modelId);
 
     /**
-     * Return a model that MUST be soft deleted or throw an Exception.
+     * Return a model by its primary key that MUST be soft deleted or throw an exception if not found.
      *
-     * @param mixed $key
+     * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model
      */
-    public function findTrashedOrFail($key);
+    public function findTrashedOrFail($modelId): Model;
+
+    /**
+     * Return a model by matching the specified field that MAY be soft deleted.
+     *
+     * @param string $field
+     * @param mixed $value
+     *
+     * @return Model|null
+     */
+    public function findOneByWithTrashed($field, $value);
+
+    /**
+     * Return a model by matching the specified field that MAY be soft deleted or throw an exception if not found.
+     *
+     * @param string $field
+     * @param mixed $value
+     *
+     * @return Model
+     */
+    public function findOneByWithTrashedOrFail($field, $value): Model;
+
+    /**
+     * Return a model by matching the specified field that MUST be soft deleted.
+     *
+     * @param string $field
+     * @param mixed $value
+     *
+     * @return Model|null
+     */
+    public function findTrashedOneBy($field, $value);
+
+    /**
+     * Return a model by matching the specified field that MUST be soft deleted or throw an exception if not found.
+     *
+     * @param string $field
+     * @param mixed $value
+     *
+     * @return Model
+     */
+    public function findTrashedOneByOrFail($field, $value): Model;
 }

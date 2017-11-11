@@ -7,6 +7,8 @@ use Tmd\LaravelRepositories\Tests\Models\Post;
 
 class PostRepository extends AbstractRepository
 {
+    use TestableRepositoryTrait;
+
     /**
      * Return the fully qualified class name of the Models this repository returns.
      *

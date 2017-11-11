@@ -2,10 +2,10 @@
 
 namespace Tmd\LaravelRepositories\Tests\Repositories;
 
-use Tmd\LaravelRepositories\Base\AbstractCachedRepository;
-use Tmd\LaravelRepositories\Tests\Models\Post;
+use Tmd\LaravelRepositories\Base\AbstractSoftDeletableRepository;
+use Tmd\LaravelRepositories\Tests\Models\Comment;
 
-class CachedPostRepository extends AbstractCachedRepository
+class CommentRepository extends AbstractSoftDeletableRepository
 {
     use TestableRepositoryTrait;
 
@@ -16,6 +16,6 @@ class CachedPostRepository extends AbstractCachedRepository
      */
     public function getModelClass()
     {
-        return Post::class;
+        return Comment::class;
     }
 }

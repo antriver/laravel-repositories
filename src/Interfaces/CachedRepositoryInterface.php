@@ -5,12 +5,12 @@ namespace Tmd\LaravelRepositories\Interfaces;
 interface CachedRepositoryInterface
 {
     /**
-     * @param mixed $key
+     * @param mixed $modelId
      */
-    public function forget($key);
+    public function forgetById($modelId);
 
     /**
-     * @param mixed $key
+     * @param mixed $modelId
      */
-    public function refresh($key);
+    public function refreshById($modelId);
 }

@@ -3,6 +3,7 @@
 namespace Tmd\LaravelRepositories\Base;
 
 use DB;
+use Exception;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Tmd\LaravelRepositories\Interfaces\RepositoryInterface;
@@ -41,50 +42,50 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Return a model by its primary key.
      *
-     * @param mixed $key
+     * @param mixed $modelId
      *
      * @return EloquentModel|null
      */
-    public function find($key)
+    public function find($modelId)
     {
-        if (empty($key)) {
+        if (empty($modelId)) {
             return null;
         }
 
-        return $this->queryDatabaseForModelByKey($key);
+        return $this->queryDatabaseForModelByKey($modelId);
     }
 
     /**
      * Return a model by its primary key. Throws an exception if not found.
      *
-     * @param mixed $key
+     * @param mixed $modelId
      *
      * @return EloquentModel|null
      *
      * @throws ModelNotFoundException
      */
-    public function findOrFail($key)
+    public function findOrFail($modelId)
     {
-        if ($model = $this->find($key)) {
+        if ($model = $this->find($modelId)) {
             return $model;
         }
 
-        throw $this->createNotFoundException($this->create()->getKeyName(), $key);
+        throw $this->createNotFoundException($modelId);
     }
 
     /**
      * Return a model by the value of a field.
      *
      * @param string $field
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return EloquentModel|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function findOneBy($field, $value)
     {
         if (empty($field)) {
-            throw new \Exception("A field must be specified.");
+            throw new Exception("A field must be specified.");
         }
 
         if (empty($value)) {
@@ -98,7 +99,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * Return a model by the value of a field. Throws an exception if not found.
      *
      * @param string $field
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return EloquentModel|null
      *
@@ -109,7 +110,8 @@ abstract class AbstractRepository implements RepositoryInterface
         if ($model = $this->findOneBy($field, $value)) {
             return $model;
         }
-        throw $this->createNotFoundException($field, $value);
+
+        throw $this->createNotFoundException($value, $field);
     }
 
     /**
@@ -119,16 +121,9 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function persist(EloquentModel $model)
     {
-        $wasPreviouslyRecentlyCreated = $model->wasRecentlyCreated;
+        $previousWasRecentlyCreated = $model->wasRecentlyCreated;
 
-        // getDirty returns the current value of the attributes.
-        $dirtyAttributes = $model->getDirty();
-
-        // Get the original values of the dirty attributes.
-        $originalDirtyAttributes = [];
-        foreach ($dirtyAttributes as $key => $newValue) {
-            $originalDirtyAttributes[$key] = $model->getOriginal($key);
-        }
+        $originalDirtyAttributes = $this->getDirtyOriginalValues($model);
 
         if (!$model->save()) {
             return false;
@@ -136,7 +131,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
         // The model may be saved multiple times in the same request.
         // So check if this is the first time it was created.
-        $isNew = !$wasPreviouslyRecentlyCreated && $model->wasRecentlyCreated;
+        $isNew = !$previousWasRecentlyCreated && $model->wasRecentlyCreated;
         if ($isNew) {
             $this->onInsert($model);
         } else {
@@ -169,11 +164,13 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function remove(EloquentModel $model)
     {
+        $originalDirtyAttributes = $this->getDirtyOriginalValues($model);
+
         $result = !!$model->delete();
 
         if ($result) {
             $this->onDelete($model);
-            $this->onChange($model);
+            $this->onChange($model, $originalDirtyAttributes);
         }
 
         return $result;
@@ -183,8 +180,8 @@ abstract class AbstractRepository implements RepositoryInterface
      * Atomically increment the specified column of the model. Returns the model with the new value.
      *
      * @param EloquentModel $model
-     * @param string        $column
-     * @param int           $amount
+     * @param string $column
+     * @param int $amount
      *
      * @return EloquentModel|null
      */
@@ -199,8 +196,8 @@ abstract class AbstractRepository implements RepositoryInterface
      * Atomically decrement the specified column of the model. Returns the model with the new value.
      *
      * @param EloquentModel $model
-     * @param string        $column
-     * @param int           $amount
+     * @param string $column
+     * @param int $amount
      *
      * @return EloquentModel|null
      */
@@ -213,18 +210,18 @@ abstract class AbstractRepository implements RepositoryInterface
      * Atomically adjust the specified column of the model. Returns the model with the new value.
      *
      * @param EloquentModel $model
-     * @param string        $column
-     * @param int           $amount
+     * @param string $column
+     * @param int $amount
      *
      * @return EloquentModel|null
      */
     protected function incrementOrDecrement(EloquentModel $model, $column, $amount = 1)
     {
         $originalAttributes = [
-            $column => $model->{$column}
+            $column => $model->{$column},
         ];
 
-        $amount = (int)$amount;
+        $amount = (int) $amount;
 
         $query = "UPDATE `{$model->getTable()}`
         SET `{$column}` = `{$column}` + {$amount}
@@ -247,14 +244,14 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     protected function onInsert(EloquentModel $model)
     {
-       // Does nothing by default.
+        // Does nothing by default.
     }
 
     /**
      * Called when an existing model is updated.
      *
      * @param EloquentModel $model
-     * @param array         $dirtyAttributes Array of attributes that were changed, and their previous value.
+     * @param array $dirtyAttributes Array of attributes that were changed, and their previous value.
      */
     protected function onUpdate(EloquentModel $model, array $dirtyAttributes = null)
     {
@@ -275,26 +272,28 @@ abstract class AbstractRepository implements RepositoryInterface
      * Called when the model is inserted, updated, or deleted. After the onInsert/onUpdate/onDelete methods are called.
      *
      * @param EloquentModel $model
-     * @param array         $dirtyAttributes Array of attributes that were changed, and their previous value.
+     * @param array $dirtyAttributes Array of attributes that were changed, and their previous value.
+     *                               (Will be empty when deleting)
+     *
      */
-    protected function onChange(EloquentModel $model, array $dirtyAttributes = null)
+    protected function onChange(EloquentModel $model, array $dirtyAttributes = [])
     {
         // Does nothing by default.
     }
 
     /**
-     * @param mixed $key
+     * @param mixed $modelId
      *
      * @return EloquentModel|null
      */
-    protected function queryDatabaseForModelByKey($key)
+    protected function queryDatabaseForModelByKey($modelId)
     {
-        return $this->create()->newQuery()->find($key);
+        return $this->create()->newQuery()->find($modelId);
     }
 
     /**
      * @param string $field
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return EloquentModel|null
      */
@@ -303,10 +302,15 @@ abstract class AbstractRepository implements RepositoryInterface
         return $this->create()->newQuery()->where($field, $value)->first();
     }
 
+    public function getModelKeyName()
+    {
+        return $this->create()->getKeyName();
+    }
+
     /**
      * @return string
      */
-    protected function getModelClassWithoutNamespace()
+    public function getModelClassWithoutNamespace()
     {
         $string = explode('\\', $this->getModelClass());
 
@@ -320,12 +324,36 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return ModelNotFoundException
      */
-    protected function createNotFoundException($field, $value, $message = null)
+    public function createNotFoundException($value, $field = null, $message = null)
     {
         if (!$message) {
+            if ($field === null) {
+                $field = $this->getModelKeyName();
+            }
             $message = "{$this->getModelClass()} with {$field} {$value} not found.";
         }
 
         return new ModelNotFoundException($message, 404);
+    }
+
+    /**
+     * Return which attributes of a model are dirty, and what their original value was.
+     *
+     * @param EloquentModel $model
+     *
+     * @return array
+     */
+    protected function getDirtyOriginalValues(EloquentModel $model)
+    {
+        // Returns the names of dirty attributes and their *current* values.
+        $dirtyAttributes = $model->getDirty();
+
+        // Get the original values of the dirty attributes.
+        $originalDirtyAttributes = [];
+        foreach ($dirtyAttributes as $attributeName => $currentValue) {
+            $originalDirtyAttributes[$attributeName] = $model->getOriginal($attributeName);
+        }
+
+        return $originalDirtyAttributes;
     }
 }
