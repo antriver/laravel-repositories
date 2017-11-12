@@ -4,12 +4,13 @@ namespace Tmd\LaravelRepositories\Base\Traits;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 use Tmd\LaravelRepositories\Base\AbstractRepository;
 
 /**
  * Implementation of some of the methods in SoftDeletableRepositoryInterface by always querying the database.
  */
-trait FindSoftDeletableModelsTrait
+trait QueryForSoftDeletableModelsTrait
 {
     /**
      * Return a model by its primary key that MAY be soft deleted.
@@ -18,7 +19,7 @@ trait FindSoftDeletableModelsTrait
      *
      * @return Model|null
      */
-    public function findWithTrashed($modelId)
+    public function findWithTrashed($modelId): ?Model
     {
         /** @var AbstractRepository $this */
         $class = $this->getModelClass();
@@ -33,7 +34,7 @@ trait FindSoftDeletableModelsTrait
      *
      * @return Model|null
      */
-    public function findTrashed($modelId)
+    public function findTrashed($modelId): ?Model
     {
         /** @var AbstractRepository $this */
         $class = $this->getModelClass();
@@ -48,12 +49,12 @@ trait FindSoftDeletableModelsTrait
      * @param mixed $value
      *
      * @return Model|null
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
-    public function findOneByWithTrashed($field, $value)
+    public function findOneByWithTrashed(string $field, $value): ?Model
     {
         if (empty($field)) {
-            throw new Exception("A field must be specified.");
+            throw new InvalidArgumentException("A field must be specified.");
         }
 
         if (empty($value)) {
@@ -73,12 +74,12 @@ trait FindSoftDeletableModelsTrait
      * @param mixed $value
      *
      * @return Model|null
-     * @throws Exception
+     * @throws InvalidArgumentException
      */
-    public function findTrashedOneBy($field, $value)
+    public function findTrashedOneBy(string $field, $value): ?Model
     {
         if (empty($field)) {
-            throw new Exception("A field must be specified.");
+            throw new InvalidArgumentException("A field must be specified.");
         }
 
         if (empty($value)) {

@@ -2,7 +2,7 @@
 
 namespace Tmd\LaravelRepositories\Interfaces;
 
-use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Illuminate\Database\Eloquent\Model;
 
 interface RepositoryInterface
 {
@@ -11,18 +11,18 @@ interface RepositoryInterface
      *
      * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    public function find($modelId);
+    public function find($modelId): ?Model;
 
     /**
      * Return a model by its primary key or throw an exception if not found.
      *
      * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model
      */
-    public function findOrFail($modelId);
+    public function findOrFail($modelId): Model;
 
     /**
      * Return a model by matching the specified field.
@@ -30,9 +30,9 @@ interface RepositoryInterface
      * @param string $field
      * @param mixed $value
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    public function findOneBy($field, $value);
+    public function findOneBy(string $field, $value): ?Model;
 
     /**
      * Return a model by matching the specified field or throw an exception if not found.
@@ -40,25 +40,25 @@ interface RepositoryInterface
      * @param string $field
      * @param mixed $value
      *
-     * @return EloquentModel|null
+     * @return Model
      */
-    public function findOneByOrFail($field, $value);
+    public function findOneByOrFail(string $field, $value): Model;
 
     /**
      * Save a model to the database.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      *
-     * @return EloquentModel
+     * @return bool
      */
-    public function persist(EloquentModel $model);
+    public function persist(Model $model): bool;
 
     /**
      * Delete a model from the database.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      *
      * @return bool
      */
-    public function remove(EloquentModel $model);
+    public function remove(Model $model): bool;
 }

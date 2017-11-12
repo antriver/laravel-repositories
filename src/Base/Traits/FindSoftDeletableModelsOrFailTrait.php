@@ -3,6 +3,7 @@
 namespace Tmd\LaravelRepositories\Base\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Tmd\LaravelRepositories\Base\AbstractRepository;
 use Tmd\LaravelRepositories\Interfaces\SoftDeletableRepositoryInterface;
 
@@ -17,6 +18,7 @@ trait FindSoftDeletableModelsOrFailTrait
      * @param mixed $modelId
      *
      * @return Model
+     * @throws ModelNotFoundException
      */
     public function findWithTrashedOrFail($modelId): Model
     {
@@ -35,6 +37,7 @@ trait FindSoftDeletableModelsOrFailTrait
      * @param mixed $modelId
      *
      * @return Model
+     * @throws ModelNotFoundException
      */
     public function findTrashedOrFail($modelId): Model
     {
@@ -54,8 +57,9 @@ trait FindSoftDeletableModelsOrFailTrait
      * @param mixed $value
      *
      * @return Model
+     * @throws ModelNotFoundException
      */
-    public function findOneByWithTrashedOrFail($field, $value): Model
+    public function findOneByWithTrashedOrFail(string $field, $value): Model
     {
         /** @var AbstractRepository|SoftDeletableRepositoryInterface|self $this */
 
@@ -73,8 +77,9 @@ trait FindSoftDeletableModelsOrFailTrait
      * @param mixed $value
      *
      * @return Model
+     * @throws ModelNotFoundException
      */
-    public function findTrashedOneByOrFail($field, $value): Model
+    public function findTrashedOneByOrFail(string $field, $value): Model
     {
         /** @var AbstractRepository|SoftDeletableRepositoryInterface|self $this */
 

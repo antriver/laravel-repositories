@@ -13,7 +13,7 @@ interface SoftDeletableRepositoryInterface
      *
      * @return Model|null
      */
-    public function findWithTrashed($modelId);
+    public function findWithTrashed($modelId): ?Model;
 
     /**
      * Return a model by its primary key that MAY be soft deleted or throw an exception if not found.
@@ -31,7 +31,7 @@ interface SoftDeletableRepositoryInterface
      *
      * @return Model|null
      */
-    public function findTrashed($modelId);
+    public function findTrashed($modelId): ?Model;
 
     /**
      * Return a model by its primary key that MUST be soft deleted or throw an exception if not found.
@@ -50,7 +50,7 @@ interface SoftDeletableRepositoryInterface
      *
      * @return Model|null
      */
-    public function findOneByWithTrashed($field, $value);
+    public function findOneByWithTrashed(string $field, $value): ?Model;
 
     /**
      * Return a model by matching the specified field that MAY be soft deleted or throw an exception if not found.
@@ -60,7 +60,7 @@ interface SoftDeletableRepositoryInterface
      *
      * @return Model
      */
-    public function findOneByWithTrashedOrFail($field, $value): Model;
+    public function findOneByWithTrashedOrFail(string $field, $value): Model;
 
     /**
      * Return a model by matching the specified field that MUST be soft deleted.
@@ -70,7 +70,7 @@ interface SoftDeletableRepositoryInterface
      *
      * @return Model|null
      */
-    public function findTrashedOneBy($field, $value);
+    public function findTrashedOneBy(string $field, $value): ?Model;
 
     /**
      * Return a model by matching the specified field that MUST be soft deleted or throw an exception if not found.
@@ -80,5 +80,5 @@ interface SoftDeletableRepositoryInterface
      *
      * @return Model
      */
-    public function findTrashedOneByOrFail($field, $value): Model;
+    public function findTrashedOneByOrFail(string $field, $value): Model;
 }

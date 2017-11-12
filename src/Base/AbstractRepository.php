@@ -3,13 +3,16 @@
 namespace Tmd\LaravelRepositories\Base;
 
 use DB;
-use Exception;
-use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use InvalidArgumentException;
+use Tmd\LaravelRepositories\Base\Traits\FindModelsOrFailTrait;
 use Tmd\LaravelRepositories\Interfaces\RepositoryInterface;
 
 abstract class AbstractRepository implements RepositoryInterface
 {
+    use FindModelsOrFailTrait;
+
     /**
      * Return the fully qualified class name of the Models this repository returns.
      *
@@ -20,7 +23,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Return a new instance of this model.
      *
-     * @return EloquentModel
+     * @return Model
      */
     public function create()
     {
@@ -32,7 +35,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Return all of this model.
      *
-     * @return \Illuminate\Database\Eloquent\Collection|EloquentModel[]
+     * @return \Illuminate\Database\Eloquent\Collection|Model[]
      */
     public function all()
     {
@@ -44,9 +47,9 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    public function find($modelId)
+    public function find($modelId): ?Model
     {
         if (empty($modelId)) {
             return null;
@@ -55,23 +58,7 @@ abstract class AbstractRepository implements RepositoryInterface
         return $this->queryDatabaseForModelByKey($modelId);
     }
 
-    /**
-     * Return a model by its primary key. Throws an exception if not found.
-     *
-     * @param mixed $modelId
-     *
-     * @return EloquentModel|null
-     *
-     * @throws ModelNotFoundException
-     */
-    public function findOrFail($modelId)
-    {
-        if ($model = $this->find($modelId)) {
-            return $model;
-        }
 
-        throw $this->createNotFoundException($modelId);
-    }
 
     /**
      * Return a model by the value of a field.
@@ -79,13 +66,12 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param string $field
      * @param mixed $value
      *
-     * @return EloquentModel|null
-     * @throws Exception
+     * @return Model|null
      */
-    public function findOneBy($field, $value)
+    public function findOneBy(string $field, $value): ?Model
     {
         if (empty($field)) {
-            throw new Exception("A field must be specified.");
+            throw new InvalidArgumentException("A field must be specified.");
         }
 
         if (empty($value)) {
@@ -95,31 +81,14 @@ abstract class AbstractRepository implements RepositoryInterface
         return $this->queryDatabaseForModelByField($field, $value);
     }
 
-    /**
-     * Return a model by the value of a field. Throws an exception if not found.
-     *
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return EloquentModel|null
-     *
-     * @throws ModelNotFoundException
-     */
-    public function findOneByOrFail($field, $value)
-    {
-        if ($model = $this->findOneBy($field, $value)) {
-            return $model;
-        }
 
-        throw $this->createNotFoundException($value, $field);
-    }
 
     /**
-     * @param EloquentModel $model
+     * @param Model $model
      *
      * @return bool
      */
-    public function persist(EloquentModel $model)
+    public function persist(Model $model): bool
     {
         $previousWasRecentlyCreated = $model->wasRecentlyCreated;
 
@@ -146,11 +115,11 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Fetch a fresh copy of the model from the database.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    public function fresh(EloquentModel $model)
+    public function fresh(Model $model): Model
     {
         return $model->fresh();
     }
@@ -158,11 +127,11 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Delete a model from the database.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      *
      * @return bool
      */
-    public function remove(EloquentModel $model)
+    public function remove(Model $model): bool
     {
         $originalDirtyAttributes = $this->getDirtyOriginalValues($model);
 
@@ -179,13 +148,13 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Atomically increment the specified column of the model. Returns the model with the new value.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      * @param string $column
      * @param int $amount
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    public function increment(EloquentModel $model, $column, $amount = 1)
+    public function increment(Model $model, $column, $amount = 1)
     {
         $this->incrementOrDecrement($model, $column, $amount);
 
@@ -195,13 +164,13 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Atomically decrement the specified column of the model. Returns the model with the new value.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      * @param string $column
      * @param int $amount
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    public function decrement(EloquentModel $model, $column, $amount = 1)
+    public function decrement(Model $model, $column, $amount = 1)
     {
         return $this->increment($model, $column, -$amount);
     }
@@ -209,13 +178,13 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Atomically adjust the specified column of the model. Returns the model with the new value.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      * @param string $column
      * @param int $amount
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    protected function incrementOrDecrement(EloquentModel $model, $column, $amount = 1)
+    protected function incrementOrDecrement(Model $model, $column, $amount = 1)
     {
         $originalAttributes = [
             $column => $model->{$column},
@@ -240,9 +209,9 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Called when a model is saved for the first time.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      */
-    protected function onInsert(EloquentModel $model)
+    protected function onInsert(Model $model)
     {
         // Does nothing by default.
     }
@@ -250,10 +219,10 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Called when an existing model is updated.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      * @param array $dirtyAttributes Array of attributes that were changed, and their previous value.
      */
-    protected function onUpdate(EloquentModel $model, array $dirtyAttributes = null)
+    protected function onUpdate(Model $model, array $dirtyAttributes = null)
     {
         // Does nothing by default.
     }
@@ -261,9 +230,9 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Called when a model is deleted.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      */
-    protected function onDelete(EloquentModel $model)
+    protected function onDelete(Model $model)
     {
         // Does nothing by default.
     }
@@ -271,12 +240,12 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Called when the model is inserted, updated, or deleted. After the onInsert/onUpdate/onDelete methods are called.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      * @param array $dirtyAttributes Array of attributes that were changed, and their previous value.
      *                               (Will be empty when deleting)
      *
      */
-    protected function onChange(EloquentModel $model, array $dirtyAttributes = [])
+    protected function onChange(Model $model, array $dirtyAttributes = [])
     {
         // Does nothing by default.
     }
@@ -284,7 +253,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
     protected function queryDatabaseForModelByKey($modelId)
     {
@@ -295,9 +264,9 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param string $field
      * @param mixed $value
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    protected function queryDatabaseForModelByField($field, $value)
+    protected function queryDatabaseForModelByField(string $field, $value)
     {
         return $this->create()->newQuery()->where($field, $value)->first();
     }
@@ -324,7 +293,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return ModelNotFoundException
      */
-    public function createNotFoundException($value, $field = null, $message = null)
+    public function createNotFoundException($value, $field = null, $message = null): ModelNotFoundException
     {
         if (!$message) {
             if ($field === null) {
@@ -339,11 +308,11 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Return which attributes of a model are dirty, and what their original value was.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      *
      * @return array
      */
-    protected function getDirtyOriginalValues(EloquentModel $model)
+    protected function getDirtyOriginalValues(Model $model)
     {
         // Returns the names of dirty attributes and their *current* values.
         $dirtyAttributes = $model->getDirty();

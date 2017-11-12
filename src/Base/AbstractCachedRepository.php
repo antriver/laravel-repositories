@@ -5,7 +5,8 @@ namespace Tmd\LaravelRepositories\Base;
 use Cache;
 use Exception;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Illuminate\Database\Eloquent\Model;
+use Tmd\LaravelRepositories\Base\Traits\FindModelsOrFailTrait;
 use Tmd\LaravelRepositories\Interfaces\CachedRepositoryInterface;
 
 abstract class AbstractCachedRepository extends AbstractRepository implements CachedRepositoryInterface
@@ -30,14 +31,28 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
 
     /**
      * Return a model by its primary key.
-     * If the model is not found, 'false' is cached to remember that it does not exist.
-     * But the method will always return a model or null.
+     *
+     * If the model is not found boolean 'false' is cached to remember that it does not exist.
+     * (Thee method will always return a model or null regardless)
      *
      * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
-    public function find($modelId)
+    public function find($modelId): ?Model
+    {
+        return $this->findModelById($modelId);
+    }
+
+    /**
+     * This is a separate method just called by find() and findOneBy() as we want to be able to
+     * override find() in subclasses without any custom functionality also affecting findOneBy()
+     *
+     * @param $modelId
+     *
+     * @return Model|null
+     */
+    protected function findModelById($modelId): ?Model
     {
         if (empty($modelId)) {
             return null;
@@ -45,13 +60,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
 
         $cacheKey = $this->getCacheKey($modelId);
 
-        if (empty($cacheKey)) {
-            return null;
-        }
-
         $modelOrFalse = $this->cache->get($cacheKey);
-        if ($modelOrFalse !== null) {
-            return $modelOrFalse === false ? null : $modelOrFalse;
+        if ($modelOrFalse === false) {
+            return null;
+        } elseif (!empty($modelOrFalse)) {
+            return $modelOrFalse;
         }
 
         $modelResult = $this->queryDatabaseForModelByKey($modelId);
@@ -65,10 +78,10 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * @param string $field
      * @param mixed $value
      *
-     * @return EloquentModel|null
+     * @return Model|null
      * @throws Exception
      */
-    public function findOneBy($field, $value)
+    public function findOneBy(string $field, $value): ?Model
     {
         if (empty($field)) {
             throw new Exception("A field must be specified.");
@@ -88,7 +101,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
             return null;
         } elseif ($id) {
             // Sweet, we know the key/ID - look up the model using that.
-            return $this->find($id);
+            return $this->findModelById($id);
         }
 
         // Query for the model using the field.
@@ -128,11 +141,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     }
 
     /**
-     * @param EloquentModel $model
+     * @param Model $model
      *
      * @return bool
      */
-    public function forgetByModel(EloquentModel $model)
+    public function forgetByModel(Model $model)
     {
         return $this->forgetById($model->getKey());
     }
@@ -140,9 +153,9 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     /**
      * Store the given model in the cache.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      */
-    public function rememberModel(EloquentModel $model)
+    public function rememberModel(Model $model)
     {
         $this->storeModelResultInCache($model->getKey(), $model);
         // TODO: Also cache the ID for certain field values here? e.g. the ID for the user's username.
@@ -153,9 +166,9 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * Override this method to forget the cached values of $this->getKeyForFieldCacheKey if used.
      * This is called when removing (deleting) a model.
      *
-     * @param EloquentModel $model
+     * @param Model $model
      */
-    public function forgetFieldKeys(EloquentModel $model)
+    public function forgetFieldKeys(Model $model)
     {
 
     }
@@ -165,7 +178,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @param mixed $modelId
      *
-     * @return EloquentModel|null
+     * @return Model|null
      */
     public function refreshById($modelId)
     {
@@ -176,11 +189,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     }
 
     /**
-     * @param EloquentModel $model
+     * @param Model $model
      *
      * @return bool
      */
-    public function persist(EloquentModel $model)
+    public function persist(Model $model): bool
     {
         if (parent::persist($model)) {
             $this->rememberModel($this->fresh($model));
@@ -191,7 +204,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         return false;
     }
 
-    public function fresh(EloquentModel $model)
+    public function fresh(Model $model): Model
     {
         $model = parent::fresh($model);
 
@@ -201,11 +214,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     }
 
     /**
-     * @param EloquentModel $model
+     * @param Model $model
      *
      * @return bool
      */
-    public function remove(EloquentModel $model)
+    public function remove(Model $model): bool
     {
         $result = parent::remove($model);
         if ($result) {
@@ -216,7 +229,14 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         return $result;
     }
 
-    public function incrementOrDecrement(EloquentModel $model, $column, $amount = 1)
+    /**
+     * @param Model $model
+     * @param string $column
+     * @param int $amount
+     *
+     * @return Model|null
+     */
+    public function incrementOrDecrement(Model $model, $column, $amount = 1)
     {
         parent::incrementOrDecrement($model, $column, $amount);
 
@@ -227,7 +247,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * Store a model (or remember its lack of existence) in the cache.
      *
      * @param mixed $modelId
-     * @param EloquentModel|null $model
+     * @param Model|null $model
      */
     protected function storeModelResultInCache($modelId, $model)
     {
@@ -261,6 +281,8 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      */
     protected function getIdForFieldCacheKey($field, $value)
     {
-        return strtolower($this->getModelClassWithoutNamespace().'-'.$field).'-id:'.strtolower($value);
+        $valueSlug = \Illuminate\Support\Str::slug($value);
+
+        return strtolower($this->getModelClassWithoutNamespace().'-'.$field.'-id:').$valueSlug;
     }
 }

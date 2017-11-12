@@ -23,6 +23,34 @@ trait CachedRepositoryTestsTrait
      */
     protected $repository;
 
+    public function testFindStoresInCache()
+    {
+        $this->assertNull($this->cache->get($this->getModelNameString().':1'));
+
+        $this->assertInstanceOf(
+            $this->getTestModelClass(),
+            $this->repository->find(1)
+        );
+
+        $cachedModel = $this->cache->get($this->getModelNameString().':1');
+        $this->assertInstanceOf(
+            $this->getTestModelClass(),
+            $cachedModel
+        );
+
+        $this->assertSame('Model 1', $cachedModel->text);
+    }
+
+    public function testFindStoresFalseInCache()
+    {
+        $this->assertNull($this->cache->get($this->getModelNameString().':456'));
+
+        // Ensure 'false' is cached to remember that a post does not exist.
+        $this->assertNull($this->repository->find(456));
+
+        $this->assertFalse($this->cache->get($this->getModelNameString().':456'));
+    }
+
     public function testFindUsesCache()
     {
         $this->assertNull($this->cache->get($this->getModelNameString().':123'));
@@ -36,38 +64,23 @@ trait CachedRepositoryTestsTrait
         $this->assertSame('Cached Hello World', $returnedPost->text);
     }
 
-    public function testFindStoresFalseInCache()
-    {
-        // Ensure 'false' is cached to remember that a post does not exist.
-        $this->repository->find(456);
-
-        $this->assertFalse($this->cache->get($this->getModelNameString().':456'));
-    }
-
     public function testCachedFalseIsUsed()
     {
-        $this->assertNull($this->cache->get($this->getModelNameString().':789'));
+        $this->assertNull($this->cache->get($this->getModelNameString().':2'));
 
-        // Pretend this post was looked for and not found.
-        $this->cache->forever($this->getModelNameString().':789', false);
+        // Pretend that model 2 (which was created in setUp()) was looked for and not found.
+        $this->cache->forever($this->getModelNameString().':2', false);
 
-        // Make the post actually exist
-        $post = $this->getTestModelInstance(
-            [
-                'id' => 789,
-                'text' => 'Hello world',
-            ]
-        );
-        $post->save();
-
-        // Ensure it exists
-        $this->assertInstanceOf($this->getTestModelClass(), $this->find(789));
+        // Ensure it really exists in the database.
+        $this->assertInstanceOf($this->getTestModelClass(), $this->find(2));
 
         // Test the repository thinks it does not exist due to the cached false.
-        $this->assertNull($this->repository->find(789));
-        $this->assertNull($this->repository->find(789));
-        $this->cache->forget($this->getModelNameString().':789');
-        $this->assertInstanceOf($this->getTestModelClass(), $this->repository->find(789));
+        $this->assertNull($this->repository->find(2));
+        $this->assertNull($this->repository->find(2));
+
+        // Clear the cache and it should be returned now
+        $this->cache->forget($this->getModelNameString().':2');
+        $this->assertInstanceOf($this->getTestModelClass(), $this->repository->find(2));
     }
 
     public function testRemoveRemovesFromCache()
@@ -86,11 +99,43 @@ trait CachedRepositoryTestsTrait
         $this->repository->remove($post);
 
         $this->assertNull($this->cache->get($this->getModelNameString().':'.$postId));
+
+        // It is up to the individual repositories to remove cached field/Id caches in their onDelete()
+        // method so we don't test that!
     }
 
-    public function testGetCacheKey()
+    public function testFindOneByInsertsToCache()
     {
+        $cacheKey = $this->getModelNameString().'-text-id:model-2';
+        $this->assertNull($this->cache->get($cacheKey));
 
-        //$key = $repository->getCacheKey(1);
+        $this->assertInstanceOf(
+            $this->repository->getModelClass(),
+            $this->repository->findOneBy(
+                'text',
+                'Model 2'
+            )
+        );
+
+        $this->assertSame(
+            2,
+            $this->cache->get($cacheKey)
+        );
+    }
+
+    public function testFindOneByUsesCache()
+    {
+        $cacheKey = $this->getModelNameString().'-text-id:model-2';
+        $this->assertNull($this->cache->get($cacheKey));
+
+        // Pretend we found an ID for this value previously, but it's one that doesn't exist:
+        $this->cache->forever($cacheKey, 400);
+
+        // Ensure it really exists in the database.
+        $existingPost = $this->find(2);
+        $this->assertInstanceOf($this->getTestModelClass(), $existingPost);
+        $this->assertSame('Model 2', $existingPost->text);
+
+        $this->assertNull($this->repository->findOneBy('text', 'Model 2'));
     }
 }
