@@ -5,6 +5,7 @@ namespace Tmd\LaravelRepositories\Base;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Tmd\LaravelRepositories\Base\Traits\FindModelsOrFailTrait;
 use Tmd\LaravelRepositories\Interfaces\RepositoryInterface;
@@ -56,6 +57,25 @@ abstract class AbstractRepository implements RepositoryInterface
         }
 
         return $this->queryDatabaseForModelByKey($modelId);
+    }
+
+    /**
+     * Return a multiple models by their primary keys.
+     *
+     * @param mixed[] $modelIds
+     *
+     * @return Model[]|Collection
+     */
+    public function findMany(array $modelIds)
+    {
+        $modelIds = array_filter(
+            $modelIds,
+            function ($value) {
+                return !empty($value);
+            }
+        );
+
+        return $this->queryDatabaseForModelsByKey($modelIds);
     }
 
     /**
@@ -254,6 +274,16 @@ abstract class AbstractRepository implements RepositoryInterface
     protected function queryDatabaseForModelByKey($modelId)
     {
         return $this->create()->newQuery()->find($modelId);
+    }
+
+    /**
+     * @param mixed $modelIds
+     *
+     * @return Model[]|Collection
+     */
+    protected function queryDatabaseForModelsByKey(array $modelIds)
+    {
+        return $this->create()->newQuery()->findMany($modelIds);
     }
 
     /**

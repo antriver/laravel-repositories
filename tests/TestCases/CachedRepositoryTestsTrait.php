@@ -138,4 +138,75 @@ trait CachedRepositoryTestsTrait
 
         $this->assertNull($this->repository->findOneBy('text', 'Model 2'));
     }
+
+    public function testFindManyStoresInCache()
+    {
+        $this->assertNull($this->cache->get($this->getModelNameString().':1'));
+        $this->assertNull($this->cache->get($this->getModelNameString().':2'));
+        $this->assertNull($this->cache->get($this->getModelNameString().':500'));
+
+        $result = $this->repository->findMany([1, 2, 500]);
+
+        $actual = array_map(
+            function ($result) {
+                return $result->id;
+            },
+            $result->all()
+        );
+        sort($actual);
+
+        $this->assertSame([1, 2], $actual);
+
+        $this->assertInstanceOf($this->getTestModelClass(), $this->cache->get($this->getModelNameString().':1'));
+        $this->assertInstanceOf($this->getTestModelClass(), $this->cache->get($this->getModelNameString().':2'));
+        $this->assertFalse($this->cache->get($this->getModelNameString().':500'));
+    }
+
+    public function testFindManyUsesCache()
+    {
+        $this->assertNull($this->cache->get($this->getModelNameString().':1'));
+        $this->assertNull($this->cache->get($this->getModelNameString().':2'));
+        $this->assertNull($this->cache->get($this->getModelNameString().':500'));
+
+        // Insert a cached ID of 500 so it should come out in the result
+        $model = $this->getTestModelInstance([
+            'id' => 500,
+            'name' => 'Model 500'
+        ]);
+        $this->cache->forever($this->getModelNameString().':500', $model);
+
+        $result = $this->repository->findMany([1, 2, 500]);
+
+        $actual = array_map(
+            function ($result) {
+                return $result->id;
+            },
+            $result->all()
+        );
+        sort($actual);
+
+        $this->assertSame([1, 2, 500], $actual);
+
+        $this->assertInstanceOf($this->getTestModelClass(), $this->cache->get($this->getModelNameString().':1'));
+        $this->assertInstanceOf($this->getTestModelClass(), $this->cache->get($this->getModelNameString().':2'));
+        $this->assertInstanceOf($this->getTestModelClass(), $this->cache->get($this->getModelNameString().':500'));
+    }
+
+    public function testFindManyUsesCachedFalse()
+    {
+        // Insert a cached false for ID 2 so it should be excluded from the result and not query the DB for it.
+        $this->cache->forever($this->getModelNameString().':1', false);
+
+        $result = $this->repository->findMany([1, 2, 500]);
+
+        $actual = array_map(
+            function ($result) {
+                return $result->id;
+            },
+            $result->all()
+        );
+        sort($actual);
+
+        $this->assertSame([2], $actual);
+    }
 }

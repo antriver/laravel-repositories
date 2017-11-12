@@ -6,6 +6,7 @@ use Cache;
 use Exception;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Tmd\LaravelRepositories\Base\Traits\FindModelsOrFailTrait;
 use Tmd\LaravelRepositories\Interfaces\CachedRepositoryInterface;
 
@@ -72,6 +73,67 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         $this->storeModelResultInCache($modelId, $modelResult);
 
         return $modelResult ?: null;
+    }
+
+    /**
+     * Return a multiple models by their primary keys.
+     *
+     * @param mixed[] $modelIds
+     *
+     * @return Model[]|Collection
+     */
+    public function findMany(array $modelIds)
+    {
+        $modelIds = array_filter(
+            $modelIds,
+            function ($value) {
+                return !empty($value);
+            }
+        );
+
+        if (empty($modelIds)) {
+            return new Collection();
+        }
+
+        $models = [];
+
+        // Build an array of all the cache keys for the models.
+        $remainingModels = [];
+        foreach ($modelIds as &$modelId) {
+            $cacheKey = $this->getCacheKey($modelId);
+            $remainingModels[$cacheKey] = $modelId;
+        }
+
+        // Try to get all the models at once from the cache.
+        $cachedResults = $this->cache->many(array_keys($remainingModels));
+        foreach ($cachedResults as $cacheKey => $result) {
+            // $result will be null, false, or the model.
+            if ($result === false) {
+                // We know that it does not exist.
+                unset($remainingModels[$cacheKey]);
+            } elseif ($result) {
+                $models[$result->id] = $result;
+                unset($remainingModels[$cacheKey]);
+            }
+        }
+
+        if (count($remainingModels) < 1) {
+            return new Collection($models);
+        }
+
+        // Get any remaining models from the DB.
+        $loadedModels = $this->queryDatabaseForModelsByKey($remainingModels)->keyBy($this->getModelKeyName());
+        foreach ($remainingModels as $cacheKey => $modelId) {
+            if ($loadedModels->offsetExists($modelId)) {
+                $result = $loadedModels->offsetGet($modelId);
+                $this->storeModelResultInCache($modelId, $result, $cacheKey);
+                $models[$modelId] = $result;
+            } else {
+                $this->storeModelResultInCache($modelId, null, $cacheKey);
+            }
+        }
+
+        return new Collection($models);
     }
 
     /**
@@ -248,10 +310,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @param mixed $modelId
      * @param Model|null $model
+     * @param string|null $cacheKey
      */
-    protected function storeModelResultInCache($modelId, $model)
+    protected function storeModelResultInCache($modelId, $model, $cacheKey = null)
     {
-        $cacheKey = $this->getCacheKey($modelId);
+        $cacheKey = $cacheKey ?: $this->getCacheKey($modelId);
 
         $this->cache->forever($cacheKey, ($model ?: false));
     }

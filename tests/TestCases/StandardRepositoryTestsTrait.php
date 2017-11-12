@@ -44,6 +44,51 @@ trait StandardRepositoryTestsTrait
         $this->assertNull($post);
     }
 
+    public function testFindMany()
+    {
+        $expected = [1, 2];
+
+        $actual = array_map(
+            function ($result) {
+                return $result->id;
+            },
+            $this->repository->findMany([1, 2])->all()
+        );
+        sort($actual);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testFindManyReturnsEmpty()
+    {
+        $expected = [];
+
+        $actual = array_map(
+            function ($result) {
+                return $result->id;
+            },
+            $this->repository->findMany([])->all()
+        );
+        sort($actual);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testFindManyIgnoresMissing()
+    {
+        $expected = [2];
+
+        $actual = array_map(
+            function ($result) {
+                return $result->id;
+            },
+            $this->repository->findMany([2, 3, 4])->all()
+        );
+        sort($actual);
+
+        $this->assertSame($expected, $actual);
+    }
+
     public function testFindReturnsNullForEmptyKey()
     {
         $this->assertNull($this->repository->find(''));

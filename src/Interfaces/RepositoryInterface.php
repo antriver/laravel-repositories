@@ -3,6 +3,7 @@
 namespace Tmd\LaravelRepositories\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 interface RepositoryInterface
 {
@@ -23,6 +24,15 @@ interface RepositoryInterface
      * @return Model
      */
     public function findOrFail($modelId);
+
+    /**
+     * Return a multiple models by their primary keys.
+     *
+     * @param mixed[] $modelIds
+     *
+     * @return Model[]|Collection
+     */
+    public function findMany(array $modelIds);
 
     /**
      * Return a model by matching the specified field.
