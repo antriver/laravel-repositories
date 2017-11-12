@@ -39,7 +39,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return Model|null
      */
-    public function find($modelId): ?Model
+    public function find($modelId)
     {
         return $this->findModelById($modelId);
     }
@@ -52,7 +52,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return Model|null
      */
-    protected function findModelById($modelId): ?Model
+    protected function findModelById($modelId)
     {
         if (empty($modelId)) {
             return null;
@@ -81,7 +81,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * @return Model|null
      * @throws Exception
      */
-    public function findOneBy(string $field, $value): ?Model
+    public function findOneBy(string $field, $value)
     {
         if (empty($field)) {
             throw new Exception("A field must be specified.");
@@ -193,7 +193,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return bool
      */
-    public function persist(Model $model): bool
+    public function persist(Model $model)
     {
         if (parent::persist($model)) {
             $this->rememberModel($this->fresh($model));
@@ -204,7 +204,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         return false;
     }
 
-    public function fresh(Model $model): Model
+    public function fresh(Model $model)
     {
         $model = parent::fresh($model);
 
@@ -218,7 +218,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return bool
      */
-    public function remove(Model $model): bool
+    public function remove(Model $model)
     {
         $result = parent::remove($model);
         if ($result) {

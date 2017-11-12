@@ -20,7 +20,7 @@ trait FindSoftDeletableModelsOrFailTrait
      * @return Model
      * @throws ModelNotFoundException
      */
-    public function findWithTrashedOrFail($modelId): Model
+    public function findWithTrashedOrFail($modelId)
     {
         /** @var AbstractRepository|SoftDeletableRepositoryInterface|self $this */
 
@@ -39,7 +39,7 @@ trait FindSoftDeletableModelsOrFailTrait
      * @return Model
      * @throws ModelNotFoundException
      */
-    public function findTrashedOrFail($modelId): Model
+    public function findTrashedOrFail($modelId)
     {
         /** @var AbstractRepository|SoftDeletableRepositoryInterface|self $this */
 
@@ -59,7 +59,7 @@ trait FindSoftDeletableModelsOrFailTrait
      * @return Model
      * @throws ModelNotFoundException
      */
-    public function findOneByWithTrashedOrFail(string $field, $value): Model
+    public function findOneByWithTrashedOrFail(string $field, $value)
     {
         /** @var AbstractRepository|SoftDeletableRepositoryInterface|self $this */
 
@@ -79,7 +79,7 @@ trait FindSoftDeletableModelsOrFailTrait
      * @return Model
      * @throws ModelNotFoundException
      */
-    public function findTrashedOneByOrFail(string $field, $value): Model
+    public function findTrashedOneByOrFail(string $field, $value)
     {
         /** @var AbstractRepository|SoftDeletableRepositoryInterface|self $this */
 

@@ -49,7 +49,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return Model|null
      */
-    public function find($modelId): ?Model
+    public function find($modelId)
     {
         if (empty($modelId)) {
             return null;
@@ -68,7 +68,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return Model|null
      */
-    public function findOneBy(string $field, $value): ?Model
+    public function findOneBy(string $field, $value)
     {
         if (empty($field)) {
             throw new InvalidArgumentException("A field must be specified.");
@@ -88,7 +88,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return bool
      */
-    public function persist(Model $model): bool
+    public function persist(Model $model)
     {
         $previousWasRecentlyCreated = $model->wasRecentlyCreated;
 
@@ -119,7 +119,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return Model|null
      */
-    public function fresh(Model $model): Model
+    public function fresh(Model $model)
     {
         return $model->fresh();
     }
@@ -131,7 +131,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return bool
      */
-    public function remove(Model $model): bool
+    public function remove(Model $model)
     {
         $originalDirtyAttributes = $this->getDirtyOriginalValues($model);
 
@@ -293,7 +293,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return ModelNotFoundException
      */
-    public function createNotFoundException($value, $field = null, $message = null): ModelNotFoundException
+    public function createNotFoundException($value, $field = null, $message = null)
     {
         if (!$message) {
             if ($field === null) {

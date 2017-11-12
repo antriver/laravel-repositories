@@ -2,7 +2,6 @@
 
 namespace Tmd\LaravelRepositories\Base\Traits;
 
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 use Tmd\LaravelRepositories\Base\AbstractRepository;
@@ -19,7 +18,7 @@ trait QueryForSoftDeletableModelsTrait
      *
      * @return Model|null
      */
-    public function findWithTrashed($modelId): ?Model
+    public function findWithTrashed($modelId)
     {
         /** @var AbstractRepository $this */
         $class = $this->getModelClass();
@@ -34,7 +33,7 @@ trait QueryForSoftDeletableModelsTrait
      *
      * @return Model|null
      */
-    public function findTrashed($modelId): ?Model
+    public function findTrashed($modelId)
     {
         /** @var AbstractRepository $this */
         $class = $this->getModelClass();
@@ -51,7 +50,7 @@ trait QueryForSoftDeletableModelsTrait
      * @return Model|null
      * @throws InvalidArgumentException
      */
-    public function findOneByWithTrashed(string $field, $value): ?Model
+    public function findOneByWithTrashed(string $field, $value)
     {
         if (empty($field)) {
             throw new InvalidArgumentException("A field must be specified.");
@@ -76,7 +75,7 @@ trait QueryForSoftDeletableModelsTrait
      * @return Model|null
      * @throws InvalidArgumentException
      */
-    public function findTrashedOneBy(string $field, $value): ?Model
+    public function findTrashedOneBy(string $field, $value)
     {
         if (empty($field)) {
             throw new InvalidArgumentException("A field must be specified.");

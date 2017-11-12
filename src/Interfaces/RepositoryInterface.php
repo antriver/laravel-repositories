@@ -13,7 +13,7 @@ interface RepositoryInterface
      *
      * @return Model|null
      */
-    public function find($modelId): ?Model;
+    public function find($modelId);
 
     /**
      * Return a model by its primary key or throw an exception if not found.
@@ -22,7 +22,7 @@ interface RepositoryInterface
      *
      * @return Model
      */
-    public function findOrFail($modelId): Model;
+    public function findOrFail($modelId);
 
     /**
      * Return a model by matching the specified field.
@@ -32,7 +32,7 @@ interface RepositoryInterface
      *
      * @return Model|null
      */
-    public function findOneBy(string $field, $value): ?Model;
+    public function findOneBy(string $field, $value);
 
     /**
      * Return a model by matching the specified field or throw an exception if not found.
@@ -42,7 +42,7 @@ interface RepositoryInterface
      *
      * @return Model
      */
-    public function findOneByOrFail(string $field, $value): Model;
+    public function findOneByOrFail(string $field, $value);
 
     /**
      * Save a model to the database.
@@ -51,7 +51,7 @@ interface RepositoryInterface
      *
      * @return bool
      */
-    public function persist(Model $model): bool;
+    public function persist(Model $model);
 
     /**
      * Delete a model from the database.
@@ -60,5 +60,5 @@ interface RepositoryInterface
      *
      * @return bool
      */
-    public function remove(Model $model): bool;
+    public function remove(Model $model);
 }
