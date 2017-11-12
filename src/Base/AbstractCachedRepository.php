@@ -4,29 +4,28 @@ namespace Tmd\LaravelRepositories\Base;
 
 use Cache;
 use Exception;
-use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Tmd\LaravelRepositories\Base\Traits\FindModelsOrFailTrait;
 use Tmd\LaravelRepositories\Interfaces\CachedRepositoryInterface;
 
 abstract class AbstractCachedRepository extends AbstractRepository implements CachedRepositoryInterface
 {
     /**
-     * @var Store
+     * @var Repository
      */
     protected $cache = null;
 
     /**
-     * @param Store|null $cache
+     * @param Repository|null $cache
      */
-    public function __construct(Store $cache = null)
+    public function __construct(Repository $cache = null)
     {
         if ($cache) {
             $this->cache = $cache;
         } else {
             // Use the default cache store.
-            $this->cache = Cache::getStore();
+            $this->cache = Cache::repository(Cache::getStore());
         }
     }
 
