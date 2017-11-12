@@ -58,8 +58,6 @@ abstract class AbstractRepository implements RepositoryInterface
         return $this->queryDatabaseForModelByKey($modelId);
     }
 
-
-
     /**
      * Return a model by the value of a field.
      *
@@ -80,8 +78,6 @@ abstract class AbstractRepository implements RepositoryInterface
 
         return $this->queryDatabaseForModelByField($field, $value);
     }
-
-
 
     /**
      * @param Model $model
