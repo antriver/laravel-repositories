@@ -156,13 +156,15 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         // belongs to the user ID 1.
         // If we have that ID cached we use the find() method, as the actual model may be cached there too.
         $idCacheKey = $this->getIdForFieldCacheKey($field, $value);
-        $id = $this->cache->get($idCacheKey);
-        if ($id === false) {
-            // We previously cached that there was no model for this field/value combo.
-            return null;
-        } elseif ($id) {
-            // Sweet, we know the key/ID - look up the model using that.
-            return $this->findModelById($id);
+        if ($idCacheKey) {
+            $id = $this->cache->get($idCacheKey);
+            if ($id === false) {
+                // We previously cached that there was no model for this field/value combo.
+                return null;
+            } elseif ($id) {
+                // Sweet, we know the key/ID - look up the model using that.
+                return $this->findModelById($id);
+            }
         }
 
         // Query for the model using the field.
@@ -226,10 +228,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     /**
      * Override this method to forget the cached values of $this->getKeyForFieldCacheKey if used.
      * This is called when removing (deleting) a model.
+     * @see getIdForFieldCacheKey()
      *
      * @param Model $model
      */
-    public function forgetFieldKeys(Model $model)
+    public function forgetCachedModelIdForFields(Model $model)
     {
 
     }
@@ -283,7 +286,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     {
         $result = parent::remove($model);
         if ($result) {
-            $this->forgetFieldKeys($model);
+            $this->forgetCachedModelIdForFields($model);
             $this->forgetById($model->getKey());
         }
 
@@ -332,9 +335,13 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     }
 
     /**
-     * Return the unique string to use to cache the primary key of a model looked up by a field.
-     * e.g. For looking up users by username: user-username-key:anthony.
-     * Return null to not cache.
+     * If using 'findOneBy()', the primary key for the item matching that field will be cached so the full model
+     * can be looked up by its primary key.
+     * e.g. if you use findOneBy('username', 'Anthony'), the ID 123 can be cached.
+     * The key for this cached item is generated here.
+     * e.g. 'user-username-id:Anthony'
+     *
+     * Return null to disable this caching.
      *
      * @param string $field
      * @param mixed $value
