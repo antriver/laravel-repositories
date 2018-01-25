@@ -10,25 +10,25 @@ interface RepositoryInterface
     /**
      * Return a model by its primary key.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function find($modelId);
+    public function find(int $modelId);
 
     /**
      * Return a model by its primary key or throw an exception if not found.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model
      */
-    public function findOrFail($modelId);
+    public function findOrFail(int $modelId);
 
     /**
      * Return a multiple models by their primary keys.
      *
-     * @param mixed[] $modelIds
+     * @param int[] $modelIds
      *
      * @return Model[]|Collection
      */

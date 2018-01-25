@@ -11,12 +11,12 @@ trait FindModelsOrFailTrait
     /**
      * Return a model by its primary key. Throws an exception if not found.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model
      * @throws ModelNotFoundException
      */
-    public function findOrFail($modelId)
+    public function findOrFail(int $modelId)
     {
         /** @var AbstractRepository|self $this */
 

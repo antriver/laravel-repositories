@@ -46,11 +46,11 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Return a model by its primary key.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function find($modelId)
+    public function find(int $modelId)
     {
         if (empty($modelId)) {
             return null;
@@ -267,17 +267,17 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    protected function queryDatabaseForModelByKey($modelId)
+    protected function queryDatabaseForModelByKey(int $modelId)
     {
         return $this->create()->newQuery()->find($modelId);
     }
 
     /**
-     * @param mixed $modelIds
+     * @param int[] $modelIds
      *
      * @return Model[]|Collection
      */

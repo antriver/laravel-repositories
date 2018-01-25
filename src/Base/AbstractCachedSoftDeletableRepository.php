@@ -21,11 +21,11 @@ abstract class AbstractCachedSoftDeletableRepository extends AbstractCachedRepos
      * The model will be loaded and cached even if it is soft deleted!
      * Models will only be returned if it is not soft deleted.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function find($modelId)
+    public function find(int $modelId)
     {
         // Because of the overridden queryDatabaseForModelByKey, the findModelById() method will
         // return all models including soft deleted ones.

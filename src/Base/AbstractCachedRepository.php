@@ -35,11 +35,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * If the model is not found boolean 'false' is cached to remember that it does not exist.
      * (Thee method will always return a model or null regardless)
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function find($modelId)
+    public function find(int $modelId)
     {
         return $this->findModelById($modelId);
     }
@@ -48,11 +48,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * This is a separate method just called by find() and findOneBy() as we want to be able to
      * override find() in subclasses without any custom functionality also affecting findOneBy()
      *
-     * @param $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    protected function findModelById($modelId)
+    protected function findModelById(int $modelId)
     {
         if (empty($modelId)) {
             return null;
