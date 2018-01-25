@@ -192,11 +192,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * Remove the cached copy of a model.
      * Note that cached primary keys for other field lookups need to be forgotten too, but this does not do that.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return bool
      */
-    public function forgetById($modelId)
+    public function forgetById(int $modelId)
     {
         $cacheKey = $this->getCacheKey($modelId);
 
@@ -240,11 +240,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     /**
      * Update the cached copy of a model.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function refreshById($modelId)
+    public function refreshById(int $modelId)
     {
         $model = parent::find($modelId);
         $this->rememberModel($model);
@@ -325,11 +325,11 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * Return the unique string to use as the cache key for this model.
      * Default is the lowercase model class name.
      *
-     * @param string $modelId
+     * @param int $modelId
      *
      * @return string
      */
-    protected function getCacheKey($modelId)
+    protected function getCacheKey(int $modelId)
     {
         return strtolower($this->getModelClassWithoutNamespace()).':'.$modelId;
     }
@@ -348,7 +348,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return string|null
      */
-    protected function getIdForFieldCacheKey($field, $value)
+    protected function getIdForFieldCacheKey(string $field, $value)
     {
         $valueSlug = \Illuminate\Support\Str::slug($value);
 

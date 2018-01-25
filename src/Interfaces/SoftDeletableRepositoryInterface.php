@@ -9,38 +9,38 @@ interface SoftDeletableRepositoryInterface
     /**
      * Return a model by its primary key that MAY be soft deleted.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function findWithTrashed($modelId);
+    public function findWithTrashed(int $modelId);
 
     /**
      * Return a model by its primary key that MAY be soft deleted or throw an exception if not found.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model
      */
-    public function findWithTrashedOrFail($modelId);
+    public function findWithTrashedOrFail(int $modelId);
 
     /**
      * Return a model by its primary key that MUST be soft deleted.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function findTrashed($modelId);
+    public function findTrashed(int $modelId);
 
     /**
      * Return a model by its primary key that MUST be soft deleted or throw an exception if not found.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model
      */
-    public function findTrashedOrFail($modelId);
+    public function findTrashedOrFail(int $modelId);
 
     /**
      * Return a model by matching the specified field that MAY be soft deleted.

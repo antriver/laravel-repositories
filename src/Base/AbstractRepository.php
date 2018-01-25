@@ -62,7 +62,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * Return a multiple models by their primary keys.
      *
-     * @param mixed[] $modelIds
+     * @param int[] $modelIds
      *
      * @return Model[]|Collection
      */

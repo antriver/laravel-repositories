@@ -15,12 +15,12 @@ trait FindSoftDeletableModelsOrFailTrait
     /**
      * Return a model by its primary key that MAY be soft deleted or throw an exception if not found.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model
      * @throws ModelNotFoundException
      */
-    public function findWithTrashedOrFail($modelId)
+    public function findWithTrashedOrFail(int $modelId)
     {
         /** @var AbstractRepository|SoftDeletableRepositoryInterface|self $this */
 
@@ -34,12 +34,12 @@ trait FindSoftDeletableModelsOrFailTrait
     /**
      * Return a model by its primary key that MUST be soft deleted or throw an exception if not found.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model
      * @throws ModelNotFoundException
      */
-    public function findTrashedOrFail($modelId)
+    public function findTrashedOrFail(int $modelId)
     {
         /** @var AbstractRepository|SoftDeletableRepositoryInterface|self $this */
 

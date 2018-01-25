@@ -14,11 +14,11 @@ trait QueryForSoftDeletableModelsTrait
     /**
      * Return a model by its primary key that MAY be soft deleted.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function findWithTrashed($modelId)
+    public function findWithTrashed(int $modelId)
     {
         /** @var AbstractRepository $this */
         $class = $this->getModelClass();
@@ -29,11 +29,11 @@ trait QueryForSoftDeletableModelsTrait
     /**
      * Return a model by its primary key that MUST be soft deleted.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function findTrashed($modelId)
+    public function findTrashed(int $modelId)
     {
         /** @var AbstractRepository $this */
         $class = $this->getModelClass();

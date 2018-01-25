@@ -41,11 +41,11 @@ abstract class AbstractCachedSoftDeletableRepository extends AbstractCachedRepos
     /**
      * Return a model by its primary key that MAY be soft deleted.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function findWithTrashed($modelId)
+    public function findWithTrashed(int $modelId)
     {
         // Because of the overridden queryDatabaseForModelByKey, the findModelById() method will
         // return all models including soft deleted ones.
@@ -57,11 +57,11 @@ abstract class AbstractCachedSoftDeletableRepository extends AbstractCachedRepos
     /**
      * Return a model by its primary key that MUST be soft deleted.
      *
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    public function findTrashed($modelId)
+    public function findTrashed(int $modelId)
     {
         // Because of the overridden queryDatabaseForModelByKey, the findModelById() method will
         // return all models including soft deleted ones.
@@ -134,11 +134,11 @@ abstract class AbstractCachedSoftDeletableRepository extends AbstractCachedRepos
     }
 
     /**
-     * @param mixed $modelId
+     * @param int $modelId
      *
      * @return Model|null
      */
-    protected function queryDatabaseForModelByKey($modelId)
+    protected function queryDatabaseForModelByKey(int $modelId)
     {
         return $this->create()->newQuery()->withTrashed()->find($modelId);
     }
