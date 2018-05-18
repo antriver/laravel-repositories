@@ -350,7 +350,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      */
     protected function getIdForFieldCacheKey(string $field, $value)
     {
-        $valueSlug = \Illuminate\Support\Str::slug($value);
+        $valueSlug = md5($value);
 
         return strtolower($this->getModelClassWithoutNamespace().'-'.$field.'-id:').$valueSlug;
     }
