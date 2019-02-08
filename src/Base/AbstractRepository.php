@@ -2,6 +2,7 @@
 
 namespace Tmd\LaravelRepositories\Base;
 
+use Closure;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -13,6 +14,16 @@ use Tmd\LaravelRepositories\Interfaces\RepositoryInterface;
 abstract class AbstractRepository implements RepositoryInterface
 {
     use FindModelsOrFailTrait;
+
+    /**
+     * If set, this method will be called to create a "not found" exception rather than throwing Laravel's
+     * default ModelNotFoundException with a default message.
+     * The function receives 3 arguments: The fully qualified class name, the field being looked up, and the vale.
+     * Use the setModelNotFoundExceptionFactory to set this easily.
+     *
+     * @var Closure|null
+     */
+    protected static $modelNotFoundExceptionFactory;
 
     /**
      * Return the fully qualified class name of the Models this repository returns.
@@ -106,6 +117,8 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function persist(Model $model)
     {
+        $this->beforePersist($model);
+
         $previousWasRecentlyCreated = $model->wasRecentlyCreated;
 
         $originalDirtyAttributes = $this->getDirtyOriginalValues($model);
@@ -307,7 +320,12 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function getModelClassWithoutNamespace()
     {
-        $string = explode('\\', $this->getModelClass());
+        return self::removeNamespaceFromClass($this->getModelClass());
+    }
+
+    public static function removeNamespaceFromClass(string $className): string
+    {
+        $string = explode('\\', $className);
 
         return array_pop($string);
     }
@@ -321,10 +339,15 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function createNotFoundException($value, $field = null, $message = null)
     {
+        if ($field === null) {
+            $field = $this->getModelKeyName();
+        }
+
+        if (self::$modelNotFoundExceptionFactory instanceof Closure) {
+            return (self::$modelNotFoundExceptionFactory)($this->getModelClass(), $field, $value);
+        }
+
         if (!$message) {
-            if ($field === null) {
-                $field = $this->getModelKeyName();
-            }
             $message = "{$this->getModelClass()} with {$field} {$value} not found.";
         }
 
@@ -350,5 +373,13 @@ abstract class AbstractRepository implements RepositoryInterface
         }
 
         return $originalDirtyAttributes;
+    }
+
+    /**
+     * @param Closure|null $modelNotFoundExceptionFactory
+     */
+    public static function setModelNotFoundExceptionFactory(?Closure $modelNotFoundExceptionFactory)
+    {
+        self::$modelNotFoundExceptionFactory = $modelNotFoundExceptionFactory;
     }
 }
