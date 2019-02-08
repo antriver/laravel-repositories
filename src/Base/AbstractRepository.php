@@ -117,8 +117,6 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function persist(Model $model)
     {
-        $this->beforePersist($model);
-
         $previousWasRecentlyCreated = $model->wasRecentlyCreated;
 
         $originalDirtyAttributes = $this->getDirtyOriginalValues($model);
