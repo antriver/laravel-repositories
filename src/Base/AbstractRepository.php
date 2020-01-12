@@ -5,10 +5,10 @@ namespace Tmd\LaravelRepositories\Base;
 use Closure;
 use DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Tmd\LaravelRepositories\Base\Traits\FindModelsOrFailTrait;
+use Tmd\LaravelRepositories\Exceptions\ModelNotFoundException;
 use Tmd\LaravelRepositories\Interfaces\RepositoryInterface;
 
 abstract class AbstractRepository implements RepositoryInterface
