@@ -331,11 +331,10 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @param string $field
      * @param string $value
-     * @param string $message
      *
      * @return ModelNotFoundException
      */
-    public function createNotFoundException($value, $field = null, $message = null)
+    public function createNotFoundException($value, $field = 'id')
     {
         if ($field === null) {
             $field = $this->getModelKeyName();
@@ -345,11 +344,9 @@ abstract class AbstractRepository implements RepositoryInterface
             return (self::$modelNotFoundExceptionFactory)($this->getModelClass(), $field, $value);
         }
 
-        if (!$message) {
-            $message = "{$this->getModelClass()} with {$field} {$value} not found.";
-        }
-
-        return new ModelNotFoundException($message, 404);
+        return (new ModelNotFoundException())
+            ->setModel($this->getModelClass(), $value)
+            ->setField($field);
     }
 
     /**
