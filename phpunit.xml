@@ -25,9 +25,8 @@
         <env name="QUEUE_DRIVER" value="sync" />
 
         <env name="DB_HOST" value="192.168.28.1" />
-        <env name="DB_DATABASE" value="amirite" />
-        <env name="DB_USERNAME" value="amirite" />
-        <env name="DB_PASSWORD" value="amirite" />
-
+        <env name="DB_DATABASE" value="laravel-repositories-test" />
+        <env name="DB_USERNAME" value="root" />
+        <env name="DB_PASSWORD" value="password" />
     </php>
 </phpunit>
