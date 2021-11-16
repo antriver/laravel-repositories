@@ -39,7 +39,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return Model|null
      */
-    public function find(int $modelId)
+    public function find(int $modelId): ?Model
     {
         return $this->findModelById($modelId);
     }
@@ -52,7 +52,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return Model|null
      */
-    protected function findModelById(int $modelId)
+    protected function findModelById(int $modelId): ?Model
     {
         if (empty($modelId)) {
             return null;
@@ -142,7 +142,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * @return Model|null
      * @throws Exception
      */
-    public function findOneBy(string $field, $value)
+    public function findOneBy(string $field, $value): ?Model
     {
         if (empty($field)) {
             throw new Exception("A field must be specified.");
@@ -268,7 +268,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         return false;
     }
 
-    public function fresh(Model $model)
+    public function fresh(Model $model): Model
     {
         $model = parent::fresh($model);
 
@@ -282,7 +282,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return bool
      */
-    public function remove(Model $model)
+    public function remove(Model $model): bool
     {
         $result = parent::remove($model);
         if ($result) {
@@ -298,13 +298,15 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      * @param string $column
      * @param int $amount
      *
-     * @return Model|null
+     * @return bool
      */
-    public function incrementOrDecrement(Model $model, $column, $amount = 1)
+    public function incrementOrDecrement(Model $model, $column, $amount = 1): bool
     {
-        parent::incrementOrDecrement($model, $column, $amount);
+        $result = parent::incrementOrDecrement($model, $column, $amount);
 
-        return $this->refreshById($model->getKey());
+        $this->refreshById($model->getKey());
+
+        return $result;
     }
 
     /**

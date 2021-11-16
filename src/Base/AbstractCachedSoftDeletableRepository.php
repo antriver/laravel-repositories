@@ -25,7 +25,7 @@ abstract class AbstractCachedSoftDeletableRepository extends AbstractCachedRepos
      *
      * @return Model|null
      */
-    public function find(int $modelId)
+    public function find(int $modelId): ?Model
     {
         // Because of the overridden queryDatabaseForModelByKey, the findModelById() method will
         // return all models including soft deleted ones.
@@ -82,7 +82,7 @@ abstract class AbstractCachedSoftDeletableRepository extends AbstractCachedRepos
      *
      * @return Model|null
      */
-    public function findOneBy(string $field, $value)
+    public function findOneBy(string $field, $value): ?Model
     {
         // Because of the overridden queryDatabaseForModelByField, the parent's findOneBy() method will
         // return all models including soft deleted ones.
@@ -138,7 +138,7 @@ abstract class AbstractCachedSoftDeletableRepository extends AbstractCachedRepos
      *
      * @return Model|null
      */
-    protected function queryDatabaseForModelByKey(int $modelId)
+    protected function queryDatabaseForModelByKey(int $modelId): ?Model
     {
         return $this->create()->newQuery()->withTrashed()->find($modelId);
     }
@@ -149,7 +149,7 @@ abstract class AbstractCachedSoftDeletableRepository extends AbstractCachedRepos
      *
      * @return Model|null
      */
-    protected function queryDatabaseForModelByField(string $field, $value)
+    protected function queryDatabaseForModelByField(string $field, $value): ?Model
     {
         return $this->create()->newQuery()->withTrashed()->where($field, $value)->first();
     }

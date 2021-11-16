@@ -4,6 +4,7 @@ namespace Antriver\LaravelRepositories\Base;
 
 use Closure;
 use DB;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -30,14 +31,14 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return string
      */
-    abstract public function getModelClass();
+    abstract public function getModelClass(): string;
 
     /**
      * Return a new instance of this model.
      *
      * @return Model
      */
-    public function create()
+    public function create(): Model
     {
         $class = $this->getModelClass();
 
@@ -61,7 +62,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return Model|null
      */
-    public function find(int $modelId)
+    public function find(int $modelId): ?Model
     {
         if (empty($modelId)) {
             return null;
@@ -97,7 +98,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return Model|null
      */
-    public function findOneBy(string $field, $value)
+    public function findOneBy(string $field, $value): ?Model
     {
         if (empty($field)) {
             throw new InvalidArgumentException("A field must be specified.");
@@ -144,9 +145,9 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @param Model $model
      *
-     * @return Model|null
+     * @return Model
      */
-    public function fresh(Model $model)
+    public function fresh(Model $model): Model
     {
         return $model->fresh();
     }
@@ -158,7 +159,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return bool
      */
-    public function remove(Model $model)
+    public function remove(Model $model): bool
     {
         $originalDirtyAttributes = $this->getDirtyOriginalValues($model);
 
@@ -181,7 +182,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return Model|null
      */
-    public function increment(Model $model, $column, $amount = 1)
+    public function increment(Model $model, $column, $amount = 1): Model
     {
         $this->incrementOrDecrement($model, $column, $amount);
 
@@ -197,7 +198,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return Model|null
      */
-    public function decrement(Model $model, $column, $amount = 1)
+    public function decrement(Model $model, $column, $amount = 1): Model
     {
         return $this->increment($model, $column, -$amount);
     }
@@ -209,9 +210,9 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param string $column
      * @param int $amount
      *
-     * @return Model|null
+     * @return bool
      */
-    protected function incrementOrDecrement(Model $model, $column, $amount = 1)
+    protected function incrementOrDecrement(Model $model, $column, $amount = 1): bool
     {
         $originalAttributes = [
             $column => $model->{$column},
@@ -230,7 +231,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
         $model->{$column} += $amount;
 
-        return $result;
+        return $result > 0;
     }
 
     /**
@@ -282,7 +283,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return Model|null
      */
-    protected function queryDatabaseForModelByKey(int $modelId)
+    protected function queryDatabaseForModelByKey(int $modelId): ?Model
     {
         return $this->create()->newQuery()->find($modelId);
     }
@@ -303,12 +304,15 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return Model|null
      */
-    protected function queryDatabaseForModelByField(string $field, $value)
+    protected function queryDatabaseForModelByField(string $field, $value): ?Model
     {
         return $this->create()->newQuery()->where($field, $value)->first();
     }
 
-    public function getModelKeyName()
+    /**
+     * @return string
+     */
+    public function getModelKeyName(): string
     {
         return $this->create()->getKeyName();
     }
@@ -316,7 +320,7 @@ abstract class AbstractRepository implements RepositoryInterface
     /**
      * @return string
      */
-    public function getModelClassWithoutNamespace()
+    public function getModelClassWithoutNamespace(): string
     {
         return self::removeNamespaceFromClass($this->getModelClass());
     }
@@ -334,7 +338,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return ModelNotFoundException
      */
-    public function createNotFoundException($value, $field = 'id')
+    public function createNotFoundException($value, $field = 'id'): Exception
     {
         if ($field === null) {
             $field = $this->getModelKeyName();
@@ -356,7 +360,7 @@ abstract class AbstractRepository implements RepositoryInterface
      *
      * @return array
      */
-    protected function getDirtyOriginalValues(Model $model)
+    protected function getDirtyOriginalValues(Model $model): array
     {
         // Returns the names of dirty attributes and their *current* values.
         $dirtyAttributes = $model->getDirty();

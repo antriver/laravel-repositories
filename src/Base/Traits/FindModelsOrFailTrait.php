@@ -16,7 +16,7 @@ trait FindModelsOrFailTrait
      * @return Model
      * @throws ModelNotFoundException
      */
-    public function findOrFail(int $modelId)
+    public function findOrFail(int $modelId): Model
     {
         /** @var AbstractRepository|self $this */
 
@@ -36,7 +36,7 @@ trait FindModelsOrFailTrait
      * @return Model
      * @throws ModelNotFoundException
      */
-    public function findOneByOrFail(string $field, $value)
+    public function findOneByOrFail(string $field, $value): Model
     {
         /** @var AbstractRepository|self $this */
 

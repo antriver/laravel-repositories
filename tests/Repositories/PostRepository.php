@@ -14,7 +14,7 @@ class PostRepository extends AbstractRepository
      *
      * @return string
      */
-    public function getModelClass()
+    public function getModelClass(): string
     {
         return Post::class;
     }

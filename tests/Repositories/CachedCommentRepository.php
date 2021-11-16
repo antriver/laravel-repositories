@@ -15,7 +15,7 @@ class CachedCommentRepository extends AbstractCachedSoftDeletableRepository
      *
      * @return string
      */
-    public function getModelClass()
+    public function getModelClass(): string
     {
         return Comment::class;
     }

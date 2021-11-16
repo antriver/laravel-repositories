@@ -14,7 +14,7 @@ class CommentRepository extends AbstractSoftDeletableRepository
      *
      * @return string
      */
-    public function getModelClass()
+    public function getModelClass(): string
     {
         return Comment::class;
     }

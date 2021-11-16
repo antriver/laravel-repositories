@@ -15,7 +15,7 @@ class CachedPostRepository extends AbstractCachedRepository
      *
      * @return string
      */
-    public function getModelClass()
+    public function getModelClass(): string
     {
         return Post::class;
     }
