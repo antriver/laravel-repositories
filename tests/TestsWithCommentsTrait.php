@@ -1,14 +1,14 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests;
+namespace Antriver\LaravelRepositories\Tests;
 
-use Tmd\LaravelRepositories\Base\AbstractRepository;
-use Tmd\LaravelRepositories\Tests\Models\Comment;
-use Tmd\LaravelRepositories\Tests\Repositories\CommentRepository;
+use Antriver\LaravelRepositories\Base\AbstractRepository;
+use Antriver\LaravelRepositories\Tests\Models\Comment;
+use Antriver\LaravelRepositories\Tests\Repositories\CommentRepository;
 
 trait TestsWithCommentsTrait
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ trait TestsWithCommentsTrait
         $this->models[3]->delete();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         \DB::delete('TRUNCATE TABLE comments');
 

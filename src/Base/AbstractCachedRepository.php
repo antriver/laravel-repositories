@@ -1,13 +1,13 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Base;
+namespace Antriver\LaravelRepositories\Base;
 
 use Cache;
 use Exception;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Tmd\LaravelRepositories\Interfaces\CachedRepositoryInterface;
+use Antriver\LaravelRepositories\Interfaces\CachedRepositoryInterface;
 
 abstract class AbstractCachedRepository extends AbstractRepository implements CachedRepositoryInterface
 {
@@ -152,8 +152,8 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
             return null;
         }
 
-        // When using findOneBy() we cache the *key/ID* of the model (e.g. remember that username 'Anthony'
-        // belongs to the user ID 1.
+        // When using findOneBy() we cache the *key/ID* of the model (e.g. remember that userID 1 is the answer to
+        // the user with the username 'Anthony').
         // If we have that ID cached we use the find() method, as the actual model may be cached there too.
         $idCacheKey = $this->getIdForFieldCacheKey($field, $value);
         if ($idCacheKey) {
@@ -329,7 +329,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return string
      */
-    protected function getCacheKey(int $modelId)
+    protected function getCacheKey(int $modelId): string
     {
         return strtolower($this->getModelClassWithoutNamespace()).':'.$modelId;
     }
@@ -348,7 +348,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
      *
      * @return string|null
      */
-    protected function getIdForFieldCacheKey(string $field, $value)
+    protected function getIdForFieldCacheKey(string $field, $value): string
     {
         $valueSlug = md5($value);
 

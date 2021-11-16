@@ -1,14 +1,14 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests;
+namespace Antriver\LaravelRepositories\Tests;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\FileStore;
 use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase;
-use Tmd\LaravelRepositories\Base\AbstractRepository;
+use Antriver\LaravelRepositories\Base\AbstractRepository;
 
-abstract class RepositoryTestCase extends TestCase
+abstract class AbstractRepositoryTestCase extends TestCase
 {
     /**
      * @var FileStore
@@ -68,23 +68,6 @@ abstract class RepositoryTestCase extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('database.default', 'laravel-repositories-tests');
-        $app['config']->set(
-            'database.connections.laravel-repositories-tests',
-            [
-                'driver' => 'mysql',
-                'host' => '127.0.0.1',
-                'database' => 'laravel-repositories-tests',
-                'username' => 'root',
-                'password' => 'root',
-                'charset' => 'utf8mb4',
-                'collation' => 'utf8mb4_unicode_ci',
-                'prefix' => '',
-                'strict' => false,
-                'engine' => null,
-            ]
-        );
-
         $app['config']->set('cache.default', 'file');
         $app['config']->set(
             'cache.stores.file',
@@ -95,10 +78,10 @@ abstract class RepositoryTestCase extends TestCase
         );
 
         $cacheManager = new CacheManager($app);
-        $this->cache = $cacheManager->store('file');
+        $this->cache = $cacheManager->store();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -110,12 +93,16 @@ abstract class RepositoryTestCase extends TestCase
         $this->repository = $this->createRepository();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         // Empty cache after every test
         $this->cache->flush();
 
         $this->models = [];
+
+        $this->beforeApplicationDestroyed(function () {
+            \DB::disconnect();
+        });
 
         parent::tearDown();
     }

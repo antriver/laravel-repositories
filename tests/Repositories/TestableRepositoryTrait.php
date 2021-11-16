@@ -1,6 +1,6 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests\Repositories;
+namespace Antriver\LaravelRepositories\Tests\Repositories;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model as EloquentModel;

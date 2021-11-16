@@ -1,10 +1,10 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Base\Traits;
+namespace Antriver\LaravelRepositories\Base\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
-use Tmd\LaravelRepositories\Base\AbstractRepository;
+use Antriver\LaravelRepositories\Base\AbstractRepository;
 
 /**
  * Implementation of some of the methods in SoftDeletableRepositoryInterface by always querying the database.

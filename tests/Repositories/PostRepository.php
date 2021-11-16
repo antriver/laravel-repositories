@@ -1,9 +1,9 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests\Repositories;
+namespace Antriver\LaravelRepositories\Tests\Repositories;
 
-use Tmd\LaravelRepositories\Base\AbstractRepository;
-use Tmd\LaravelRepositories\Tests\Models\Post;
+use Antriver\LaravelRepositories\Base\AbstractRepository;
+use Antriver\LaravelRepositories\Tests\Models\Post;
 
 class PostRepository extends AbstractRepository
 {

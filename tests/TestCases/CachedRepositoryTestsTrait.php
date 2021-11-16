@@ -1,10 +1,12 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests\TestCases;
+namespace Antriver\LaravelRepositories\Tests\TestCases;
 
+use Antriver\LaravelRepositories\Tests\Repositories\CachedPostRepository;
+use Antriver\LaravelRepositories\Tests\Repositories\TestableCachedRepositoryInterface;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Model;
-use Tmd\LaravelRepositories\Base\AbstractCachedRepository;
+use Antriver\LaravelRepositories\Base\AbstractCachedRepository;
 
 trait CachedRepositoryTestsTrait
 {
@@ -19,7 +21,7 @@ trait CachedRepositoryTestsTrait
     protected $models;
 
     /**
-     * @var AbstractCachedRepository
+     * @var AbstractCachedRepository|TestableCachedRepositoryInterface
      */
     protected $repository;
 
@@ -106,9 +108,10 @@ trait CachedRepositoryTestsTrait
 
     public function testFindOneByInsertsToCache()
     {
-        $cacheKey = $this->getModelNameString().'-text-id:model-2';
+        $cacheKey = $this->repository->getIdForFieldCacheKeyPublic('text', 'Model 2');
         $this->assertNull($this->cache->get($cacheKey));
 
+        // Find a model with the text "Model 2".
         $this->assertInstanceOf(
             $this->repository->getModelClass(),
             $this->repository->findOneBy(
@@ -117,6 +120,7 @@ trait CachedRepositoryTestsTrait
             )
         );
 
+        // The id should now exist in the cache.
         $this->assertSame(
             2,
             $this->cache->get($cacheKey)
@@ -125,7 +129,7 @@ trait CachedRepositoryTestsTrait
 
     public function testFindOneByUsesCache()
     {
-        $cacheKey = $this->getModelNameString().'-text-id:model-2';
+        $cacheKey = $this->repository->getIdForFieldCacheKeyPublic('text', 'Model 2');
         $this->assertNull($this->cache->get($cacheKey));
 
         // Pretend we found an ID for this value previously, but it's one that doesn't exist:

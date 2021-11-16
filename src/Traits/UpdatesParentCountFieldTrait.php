@@ -1,9 +1,9 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Traits;
+namespace Antriver\LaravelRepositories\Traits;
 
 use Illuminate\Database\Eloquent\Model as EloquentModel;
-use Tmd\LaravelRepositories\Base\AbstractRepository;
+use Antriver\LaravelRepositories\Base\AbstractRepository;
 
 trait UpdatesParentCountFieldTrait
 {

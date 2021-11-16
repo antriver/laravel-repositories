@@ -1,11 +1,11 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Base;
+namespace Antriver\LaravelRepositories\Base;
 
 use Illuminate\Database\Eloquent\Model;
-use Tmd\LaravelRepositories\Base\Traits\FindSoftDeletableModelsOrFailTrait;
-use Tmd\LaravelRepositories\Base\Traits\QueryForSoftDeletableModelsTrait;
-use Tmd\LaravelRepositories\Interfaces\SoftDeletableRepositoryInterface;
+use Antriver\LaravelRepositories\Base\Traits\FindSoftDeletableModelsOrFailTrait;
+use Antriver\LaravelRepositories\Base\Traits\QueryForSoftDeletableModelsTrait;
+use Antriver\LaravelRepositories\Interfaces\SoftDeletableRepositoryInterface;
 
 abstract class AbstractCachedSoftDeletableRepository extends AbstractCachedRepository implements SoftDeletableRepositoryInterface
 {

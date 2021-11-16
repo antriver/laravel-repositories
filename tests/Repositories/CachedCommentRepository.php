@@ -1,13 +1,14 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests\Repositories;
+namespace Antriver\LaravelRepositories\Tests\Repositories;
 
-use Tmd\LaravelRepositories\Base\AbstractCachedSoftDeletableRepository;
-use Tmd\LaravelRepositories\Tests\Models\Comment;
+use Antriver\LaravelRepositories\Base\AbstractCachedSoftDeletableRepository;
+use Antriver\LaravelRepositories\Tests\Models\Comment;
 
 class CachedCommentRepository extends AbstractCachedSoftDeletableRepository
 {
     use TestableRepositoryTrait;
+    use TestableCachedRepositoryTrait;
 
     /**
      * Return the fully qualified class name of the Models this repository returns.

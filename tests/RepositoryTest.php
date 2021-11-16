@@ -1,18 +1,17 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests;
+namespace Antriver\LaravelRepositories\Tests;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\GoneHttpException;
-use Tmd\LaravelRepositories\Base\AbstractRepository;
-use Tmd\LaravelRepositories\Tests\Repositories\PostRepository;
-use Tmd\LaravelRepositories\Tests\TestCases\StandardRepositoryTestsTrait;
+use Antriver\LaravelRepositories\Base\AbstractRepository;
+use Antriver\LaravelRepositories\Tests\Repositories\PostRepository;
+use Antriver\LaravelRepositories\Tests\TestCases\StandardRepositoryTestsTrait;
 
-class AbstractRepositoryTest extends RepositoryTestCase
+class RepositoryTest extends AbstractRepositoryTestCase
 {
-    use TestsWithPostsTrait;
-
     use StandardRepositoryTestsTrait;
+    use TestsWithPostsTrait;
 
     /**
      * @return AbstractRepository
@@ -33,7 +32,7 @@ class AbstractRepositoryTest extends RepositoryTestCase
         );
 
         $this->expectException(GoneHttpException::class);
-        $this->expectExceptionMessage("Tmd\\LaravelRepositories\\Tests\\Models\\Post text exception time");
+        $this->expectExceptionMessage("Antriver\\LaravelRepositories\\Tests\\Models\\Post text exception time");
 
         $repo = $this->createRepository();
         $repo->findOneByOrFail('text', 'exception time');
@@ -52,7 +51,7 @@ class AbstractRepositoryTest extends RepositoryTestCase
         );
 
         $this->expectException(GoneHttpException::class);
-        $this->expectExceptionMessage("Tmd\\LaravelRepositories\\Tests\\Models\\Post text exception time");
+        $this->expectExceptionMessage("Antriver\\LaravelRepositories\\Tests\\Models\\Post text exception time");
 
         $repo = $this->createRepository();
         $repo->findOneByOrFail('text', 'exception time');
@@ -84,7 +83,7 @@ class AbstractRepositoryTest extends RepositoryTestCase
     public function testGetModelClassWithoutNamespace()
     {
         $repo = $this->createRepository();
-        $this->assertSame($repo->getModelClass(), 'Tmd\\LaravelRepositories\\Tests\\Models\\Post');
+        $this->assertSame($repo->getModelClass(), 'Antriver\\LaravelRepositories\\Tests\\Models\\Post');
         $this->assertSame($repo->getModelClassWithoutNamespace(), 'Post');
 
         $this->assertSame($repo::removeNamespaceFromClass("Hello\\World"), 'World');

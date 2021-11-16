@@ -1,10 +1,10 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Providers;
+namespace Antriver\LaravelRepositories\Providers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\ServiceProvider;
-use Tmd\LaravelRepositories\Base\AbstractRepository;
+use Antriver\LaravelRepositories\Base\AbstractRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {

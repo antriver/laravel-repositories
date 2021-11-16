@@ -1,9 +1,9 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests\Repositories;
+namespace Antriver\LaravelRepositories\Tests\Repositories;
 
-use Tmd\LaravelRepositories\Base\AbstractSoftDeletableRepository;
-use Tmd\LaravelRepositories\Tests\Models\Comment;
+use Antriver\LaravelRepositories\Base\AbstractSoftDeletableRepository;
+use Antriver\LaravelRepositories\Tests\Models\Comment;
 
 class CommentRepository extends AbstractSoftDeletableRepository
 {

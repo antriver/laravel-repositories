@@ -1,10 +1,10 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Base\Traits;
+namespace Antriver\LaravelRepositories\Base\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Tmd\LaravelRepositories\Base\AbstractRepository;
+use Antriver\LaravelRepositories\Base\AbstractRepository;
 
 trait FindModelsOrFailTrait
 {

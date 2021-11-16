@@ -1,15 +1,15 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Base;
+namespace Antriver\LaravelRepositories\Base;
 
 use Closure;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use Tmd\LaravelRepositories\Base\Traits\FindModelsOrFailTrait;
-use Tmd\LaravelRepositories\Exceptions\ModelNotFoundException;
-use Tmd\LaravelRepositories\Interfaces\RepositoryInterface;
+use Antriver\LaravelRepositories\Base\Traits\FindModelsOrFailTrait;
+use Antriver\LaravelRepositories\Exceptions\ModelNotFoundException;
+use Antriver\LaravelRepositories\Interfaces\RepositoryInterface;
 
 abstract class AbstractRepository implements RepositoryInterface
 {

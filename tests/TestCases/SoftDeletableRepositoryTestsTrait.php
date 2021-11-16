@@ -1,12 +1,12 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests\TestCases;
+namespace Antriver\LaravelRepositories\Tests\TestCases;
 
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Tmd\LaravelRepositories\Base\AbstractCachedSoftDeletableRepository;
-use Tmd\LaravelRepositories\Base\AbstractSoftDeletableRepository;
+use Antriver\LaravelRepositories\Base\AbstractCachedSoftDeletableRepository;
+use Antriver\LaravelRepositories\Base\AbstractSoftDeletableRepository;
 
 trait SoftDeletableRepositoryTestsTrait
 {
@@ -30,12 +30,12 @@ trait SoftDeletableRepositoryTestsTrait
      */
     public function testSoftDeletedInDb()
     {
-        $this->assertNull($this->find($this->models[3]));
+        $this->assertNull($this->find($this->models[3]->id));
 
         $instance = $this->getTestModelInstance();
         $this->assertInstanceOf(
             $this->getTestModelClass(),
-            $instance->newQuery()->withTrashed()->find($this->models[3])
+            $instance->newQuery()->withTrashed()->find($this->models[3]->id)
         );
     }
 

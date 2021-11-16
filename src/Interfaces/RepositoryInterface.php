@@ -1,6 +1,6 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Interfaces;
+namespace Antriver\LaravelRepositories\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;

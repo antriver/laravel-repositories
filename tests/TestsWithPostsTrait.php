@@ -1,12 +1,12 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests;
+namespace Antriver\LaravelRepositories\Tests;
 
-use Tmd\LaravelRepositories\Tests\Models\Post;
+use Antriver\LaravelRepositories\Tests\Models\Post;
 
 trait TestsWithPostsTrait
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ trait TestsWithPostsTrait
         $this->models[2]->save();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         \DB::delete('TRUNCATE TABLE posts');
 

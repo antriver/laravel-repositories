@@ -1,11 +1,12 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Tests\TestCases;
+namespace Antriver\LaravelRepositories\Tests\TestCases;
 
+use Antriver\LaravelRepositories\Tests\Repositories\TestableCachedRepositoryInterface;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Model;
-use Tmd\LaravelRepositories\Base\AbstractCachedRepository;
-use Tmd\LaravelRepositories\Base\AbstractCachedSoftDeletableRepository;
+use Antriver\LaravelRepositories\Base\AbstractCachedRepository;
+use Antriver\LaravelRepositories\Base\AbstractCachedSoftDeletableRepository;
 
 trait CachedSoftDeletableRepositoryTestsTrait
 {
@@ -20,7 +21,7 @@ trait CachedSoftDeletableRepositoryTestsTrait
     protected $models;
 
     /**
-     * @var AbstractCachedRepository|AbstractCachedSoftDeletableRepository
+     * @var AbstractCachedRepository|AbstractCachedSoftDeletableRepository|TestableCachedRepositoryInterface
      */
     protected $repository;
 
@@ -85,7 +86,8 @@ trait CachedSoftDeletableRepositoryTestsTrait
         // The CachedRepositoryTestsTrait will already establish that it returns cached items at all.
         // Here we are checking it does not return a model if it is cached but soft deleted.
 
-        $this->assertNull($this->cache->get($this->getModelNameString().':666'));
+        $cacheKey = $this->repository->getCacheKeyPublic(666);
+        $this->assertNull($this->cache->get($cacheKey));
 
         $model = $this->getTestModelInstance(
             [
@@ -96,14 +98,15 @@ trait CachedSoftDeletableRepositoryTestsTrait
         );
 
         // Cache the ID for the field value
-        $this->cache->forever($this->getModelNameString().'-text-id:cached-deleted-hello-world', 666);
+        $cacheKeyForIdByName = $this->repository->getIdForFieldCacheKeyPublic('text', 'Cached Deleted Hello World');
+        $this->cache->forever($cacheKeyForIdByName, 666);
 
         // Cache the model too
-        $this->cache->forever($this->getModelNameString().':666', $model);
+        $this->cache->forever($cacheKey, $model);
 
         $this->assertInstanceOf(
             $this->getTestModelClass(),
-            $this->cache->get($this->getModelNameString().':666')
+            $this->cache->get($cacheKey)
         );
 
         $this->assertNull(

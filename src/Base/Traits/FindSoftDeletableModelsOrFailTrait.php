@@ -1,11 +1,11 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Base\Traits;
+namespace Antriver\LaravelRepositories\Base\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Tmd\LaravelRepositories\Base\AbstractRepository;
-use Tmd\LaravelRepositories\Interfaces\SoftDeletableRepositoryInterface;
+use Antriver\LaravelRepositories\Base\AbstractRepository;
+use Antriver\LaravelRepositories\Interfaces\SoftDeletableRepositoryInterface;
 
 /**
  * Implementation of some of the methods in SoftDeletableRepositoryInterface.

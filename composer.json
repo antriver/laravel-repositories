@@ -1,6 +1,6 @@
 {
-    "name": "tmd/laravel-repositories",
-    "description": "Model repositories for Laravel 5.",
+    "name": "antriver/laravel-repositories",
+    "description": "Model repositories for Laravel.",
     "license": "MIT",
     "authors": [
         {
@@ -10,21 +10,21 @@
     ],
     "autoload": {
         "psr-4": {
-            "Tmd\\LaravelRepositories\\": "src/"
+            "Antriver\\LaravelRepositories\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tmd\\LaravelRepositories\\Tests\\": "tests/"
+            "Antriver\\LaravelRepositories\\Tests\\": "tests/"
         }
     },
     "require": {
         "php": ">=7.1.0",
-        "laravel/framework": "5.*.*"
+        "laravel/framework": "^8.0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.6",
-        "orchestra/testbench": "~3.0",
-        "mockery/mockery": "^0.9.6"
+        "phpunit/phpunit": "^9.5",
+        "orchestra/testbench": "^6.23",
+        "mockery/mockery": "^1.4"
     }
 }

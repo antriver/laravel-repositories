@@ -1,6 +1,6 @@
 <?php
 
-namespace Tmd\LaravelRepositories\Exceptions;
+namespace Antriver\LaravelRepositories\Exceptions;
 
 class ModelNotFoundException extends \Illuminate\Database\Eloquent\ModelNotFoundException
 {
