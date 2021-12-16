@@ -180,7 +180,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param string $column
      * @param int $amount
      *
-     * @return Model|null
+     * @return Model
      */
     public function increment(Model $model, $column, $amount = 1): Model
     {
@@ -196,7 +196,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param string $column
      * @param int $amount
      *
-     * @return Model|null
+     * @return Model
      */
     public function decrement(Model $model, $column, $amount = 1): Model
     {
@@ -204,7 +204,7 @@ abstract class AbstractRepository implements RepositoryInterface
     }
 
     /**
-     * Atomically adjust the specified column of the model. Returns the model with the new value.
+     * Atomically adjust the specified column of the model. Returns true on success
      *
      * @param Model $model
      * @param string $column
