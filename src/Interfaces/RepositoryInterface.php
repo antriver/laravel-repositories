@@ -71,4 +71,26 @@ interface RepositoryInterface
      * @return bool
      */
     public function remove(Model $model);
+
+    /**
+     * Atomically increment the specified column of the model. Returns the model with the new value.
+     *
+     * @param Model $model
+     * @param string $column
+     * @param int $amount
+     *
+     * @return Model
+     */
+    public function increment(Model $model, $column, $amount = 1): Model;
+
+    /**
+     * Atomically decrement the specified column of the model. Returns the model with the new value.
+     *
+     * @param Model $model
+     * @param string $column
+     * @param int $amount
+     *
+     * @return Model
+     */
+    public function decrement(Model $model, $column, $amount = 1): Model;
 }
