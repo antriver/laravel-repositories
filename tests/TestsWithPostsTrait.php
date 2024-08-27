@@ -10,7 +10,16 @@ trait TestsWithPostsTrait
     {
         parent::setUp();
 
-        \DB::delete('DELETE FROM posts');
+        \DB::statement('DROP TABLE IF EXISTS `posts`');
+        \DB::statement(
+            'CREATE TABLE `posts` (
+              `id` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              `text` VARCHAR(255) DEFAULT NULL,
+              `views` INT(11) NOT NULL DEFAULT 0,
+              `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              `updated_at` DATETIME DEFAULT NULL
+            )'
+        );
 
         $this->models[1] = new Post(
             [
@@ -27,13 +36,6 @@ trait TestsWithPostsTrait
             ]
         );
         $this->models[2]->save();
-    }
-
-    public function tearDown(): void
-    {
-        \DB::delete('DELETE FROM posts');
-
-        parent::tearDown();
     }
 
     /**
