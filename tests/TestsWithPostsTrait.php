@@ -10,7 +10,7 @@ trait TestsWithPostsTrait
     {
         parent::setUp();
 
-        \DB::delete('TRUNCATE TABLE posts');
+        \DB::delete('DELETE FROM posts');
 
         $this->models[1] = new Post(
             [
@@ -31,7 +31,7 @@ trait TestsWithPostsTrait
 
     public function tearDown(): void
     {
-        \DB::delete('TRUNCATE TABLE posts');
+        \DB::delete('DELETE FROM posts');
 
         parent::tearDown();
     }

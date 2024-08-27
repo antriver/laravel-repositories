@@ -12,7 +12,7 @@ trait TestsWithCommentsTrait
     {
         parent::setUp();
 
-        \DB::delete('TRUNCATE TABLE comments');
+        \DB::delete('DELETE FROM comments');
 
         $this->models[1] = new Comment(
             [
@@ -42,7 +42,7 @@ trait TestsWithCommentsTrait
 
     public function tearDown(): void
     {
-        \DB::delete('TRUNCATE TABLE comments');
+        \DB::delete('DELETE FROM comments');
 
         parent::tearDown();
     }
