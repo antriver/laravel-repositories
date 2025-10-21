@@ -19,7 +19,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
     /**
      * @param Repository|null $cache
      */
-    public function __construct(Repository $cache = null)
+    public function __construct(?Repository $cache = null)
     {
         if ($cache) {
             $this->cache = $cache;

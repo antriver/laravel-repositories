@@ -250,7 +250,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * @param Model $model
      * @param array $dirtyAttributes Array of attributes that were changed, and their previous value.
      */
-    protected function onUpdate(Model $model, array $dirtyAttributes = null)
+    protected function onUpdate(Model $model, ?array $dirtyAttributes = null)
     {
         // Does nothing by default.
     }
