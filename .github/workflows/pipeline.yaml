@@ -11,19 +11,20 @@ on:
 
 jobs:
   test:
+    name: "Run Tests"
+    strategy:
+      matrix:
+        php: [ '8.1.7', '8.5.4' ]
+
     runs-on: ubuntu-latest
+    container: antriver/php:${{ matrix.php }}-cli
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
-        uses: php-actions/composer@v6
-        with:
-          php_version: 8.4
-
-      - name: Fix vendor permissions
-        run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE/vendor
+        run: composer update --no-interaction --prefer-dist
 
       - name: Run tests
-        run: vendor/bin/phpunit
+        run: composer test

@@ -248,7 +248,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * Called when an existing model is updated.
      *
      * @param Model $model
-     * @param array $dirtyAttributes Array of attributes that were changed, and their previous value.
+     * @param array|null $dirtyAttributes Array of attributes that were changed, and their previous value.
      */
     protected function onUpdate(Model $model, ?array $dirtyAttributes = null)
     {
