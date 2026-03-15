@@ -51,7 +51,7 @@ trait TestableRepositoryTrait
      * @param EloquentModel $model
      * @param array|null $dirtyAttributes
      */
-    protected function onChange(EloquentModel $model, array $dirtyAttributes = null)
+    protected function onChange(EloquentModel $model, array $dirtyAttributes = [])
     {
         $this->changeCalled = true;
 
@@ -88,7 +88,7 @@ trait TestableRepositoryTrait
      * @param EloquentModel $model
      * @param array|null $dirtyAttributes
      */
-    protected function onUpdate(EloquentModel $model, array $dirtyAttributes = null)
+    protected function onUpdate(EloquentModel $model, ?array $dirtyAttributes = null)
     {
         $this->updateCalled = true;
 
