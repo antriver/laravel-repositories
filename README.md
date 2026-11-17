@@ -13,21 +13,12 @@ The package major version matches the newest Laravel major it supports, and each
 
 | Package | Laravel | PHP |
 |---|---|---|
-| 13.x | 10.x, 11.x, 12.x, 13.x | 8.1 to 8.5 |
+| 13.x | 10.x, 11.x, 12.x, 13.x | 8.3+ |
 | 10.x | 10.x | 8.1 to 8.5 |
 | 3.x | 8.x, 9.x | 7.1+ |
 | 2.x | 5.x | 7.1+ |
 
-Supported PHP versions for 13.x:
-
-| Laravel | PHP |
-|---|---|
-| 10.x | 8.1 to 8.5 |
-| 11.x | 8.2 to 8.5 |
-| 12.x | 8.2 to 8.5 |
-| 13.x | 8.3 to 8.5 |
-
-CI tests the lowest and highest PHP version for each Laravel version.
+13.x requires the same PHP version as Laravel 13. CI tests every PHP version from 8.3 to 8.5 with every Laravel version.
 
 Laravel 10 and 11 no longer receive security fixes, so new projects should use Laravel 12 or 13.
 
