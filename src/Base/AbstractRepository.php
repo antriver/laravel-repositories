@@ -3,7 +3,7 @@
 namespace Antriver\LaravelRepositories\Base;
 
 use Closure;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;

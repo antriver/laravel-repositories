@@ -5,6 +5,7 @@ namespace Antriver\LaravelRepositories\Tests;
 use Antriver\LaravelRepositories\Base\AbstractRepository;
 use Antriver\LaravelRepositories\Tests\Models\Comment;
 use Antriver\LaravelRepositories\Tests\Repositories\CommentRepository;
+use Illuminate\Support\Facades\DB;
 
 trait TestsWithCommentsTrait
 {
@@ -12,8 +13,8 @@ trait TestsWithCommentsTrait
     {
         parent::setUp();
 
-        \DB::statement('DROP TABLE IF EXISTS `comments`');
-        \DB::statement(
+        DB::statement('DROP TABLE IF EXISTS `comments`');
+        DB::statement(
             'CREATE TABLE `comments` (
               `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               `text` VARCHAR(255) DEFAULT NULL,

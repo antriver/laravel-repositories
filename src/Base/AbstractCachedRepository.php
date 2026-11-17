@@ -2,11 +2,12 @@
 
 namespace Antriver\LaravelRepositories\Base;
 
-use Cache;
+use Illuminate\Support\Facades\Cache;
 use Exception;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Antriver\LaravelRepositories\Exceptions\CachedModelNotUnserializableException;
 use Antriver\LaravelRepositories\Interfaces\CachedRepositoryInterface;
 
 abstract class AbstractCachedRepository extends AbstractRepository implements CachedRepositoryInterface
@@ -61,6 +62,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         $cacheKey = $this->getCacheKey($modelId);
 
         $modelOrFalse = $this->cache->get($cacheKey);
+        $this->guardAgainstIncompleteClass($modelOrFalse);
         if ($modelOrFalse === false) {
             return null;
         } elseif (!empty($modelOrFalse)) {
@@ -107,6 +109,7 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         $cachedResults = $this->cache->many(array_keys($remainingModels));
         foreach ($cachedResults as $cacheKey => $result) {
             // $result will be null, false, or the model.
+            $this->guardAgainstIncompleteClass($result);
             if ($result === false) {
                 // We know that it does not exist.
                 unset($remainingModels[$cacheKey]);
@@ -321,6 +324,27 @@ abstract class AbstractCachedRepository extends AbstractRepository implements Ca
         $cacheKey = $cacheKey ?: $this->getCacheKey($modelId);
 
         $this->cache->forever($cacheKey, ($model ?: false));
+    }
+
+    /**
+     * Throws when a cached value was unserialized as an incomplete class. This happens when the class is not
+     * allowed by the cache.serializable_classes config option, or when the class no longer exists.
+     *
+     * @param mixed $cached
+     *
+     * @throws CachedModelNotUnserializableException
+     */
+    protected function guardAgainstIncompleteClass($cached): void
+    {
+        if ($cached instanceof \__PHP_Incomplete_Class) {
+            $className = ((array) $cached)['__PHP_Incomplete_Class_Name'] ?? $this->getModelClass();
+
+            throw new CachedModelNotUnserializableException(
+                "A cached {$className} could not be unserialized. Either the class is not allowed by the "
+                ."'cache.serializable_classes' config option, so add it to that option, or the class no longer "
+                .'exists and the cached entry is stale.'
+            );
+        }
     }
 
     /**

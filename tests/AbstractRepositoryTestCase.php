@@ -5,6 +5,7 @@ namespace Antriver\LaravelRepositories\Tests;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\FileStore;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase;
 use Antriver\LaravelRepositories\Base\AbstractRepository;
 
@@ -101,7 +102,7 @@ abstract class AbstractRepositoryTestCase extends TestCase
         $this->models = [];
 
         $this->beforeApplicationDestroyed(function () {
-            \DB::disconnect();
+            DB::disconnect();
         });
 
         parent::tearDown();

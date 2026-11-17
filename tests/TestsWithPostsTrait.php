@@ -3,6 +3,7 @@
 namespace Antriver\LaravelRepositories\Tests;
 
 use Antriver\LaravelRepositories\Tests\Models\Post;
+use Illuminate\Support\Facades\DB;
 
 trait TestsWithPostsTrait
 {
@@ -10,8 +11,8 @@ trait TestsWithPostsTrait
     {
         parent::setUp();
 
-        \DB::statement('DROP TABLE IF EXISTS `posts`');
-        \DB::statement(
+        DB::statement('DROP TABLE IF EXISTS `posts`');
+        DB::statement(
             'CREATE TABLE `posts` (
               `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               `text` VARCHAR(255) DEFAULT NULL,

@@ -7,6 +7,30 @@ The classes provided here allow you to use a repository pattern for CRUD operati
 composer require antriver/laravel-repositories
 ```
 
+## Version support
+
+The package major version matches the newest Laravel major it supports, and each release supports as many earlier Laravel versions as it can still test.
+
+| Package | Laravel | PHP |
+|---|---|---|
+| 13.x | 10.x, 11.x, 12.x, 13.x | 8.1 to 8.5 |
+| 10.x | 10.x | 8.1 to 8.5 |
+| 3.x | 8.x, 9.x | 7.1+ |
+| 2.x | 5.x | 7.1+ |
+
+Supported PHP versions for 13.x:
+
+| Laravel | PHP |
+|---|---|
+| 10.x | 8.1 to 8.5 |
+| 11.x | 8.2 to 8.5 |
+| 12.x | 8.2 to 8.5 |
+| 13.x | 8.3 to 8.5 |
+
+CI tests the lowest and highest PHP version for each Laravel version.
+
+Laravel 10 and 11 no longer receive security fixes, so new projects should use Laravel 12 or 13.
+
 ## Basic Usage
 
 Create a class which extends `AbstractRepository`.
@@ -84,6 +108,22 @@ Forgets a cached copy of a model (does not delete it from a database).
 
 ### `refreshById(int $modelId)`
 Updates the cached copy of a model with the latest version found in the database.
+
+### Laravel 13 and `cache.serializable_classes`
+
+New Laravel 13 apps set `'serializable_classes' => false` in `config/cache.php` (Laravel 12.53 and above honour this option).
+With that setting cached models cannot be read back, and the repository throws a `CachedModelNotUnserializableException`.
+To fix it, list every model class you cache. If you cache models with loaded relations, also list the related model
+classes and `Illuminate\Database\Eloquent\Collection`. Laravel 10, 11 and 12 before 12.53 are unaffected.
+
+```php
+// config/cache.php
+'serializable_classes' => [
+    App\Models\Post::class,
+    App\Models\Comment::class,
+    Illuminate\Database\Eloquent\Collection::class,
+],
+```
 
 ## Soft Deletable Repository 
 
