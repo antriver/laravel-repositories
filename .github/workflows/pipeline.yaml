@@ -16,17 +16,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { php: '8.3.24', laravel: '^10.0', testbench: '^8.19' }
-          - { php: '8.4.11', laravel: '^10.0', testbench: '^8.19' }
+          - { php: '8.3.36', laravel: '^10.0', testbench: '^8.19' }
+          - { php: '8.4.27', laravel: '^10.0', testbench: '^8.19' }
           - { php: '8.5.12', laravel: '^10.0', testbench: '^8.19' }
-          - { php: '8.3.24', laravel: '^11.0', testbench: '^9.0' }
-          - { php: '8.4.11', laravel: '^11.0', testbench: '^9.0' }
+          - { php: '8.3.36', laravel: '^11.0', testbench: '^9.0' }
+          - { php: '8.4.27', laravel: '^11.0', testbench: '^9.0' }
           - { php: '8.5.12', laravel: '^11.0', testbench: '^9.0' }
-          - { php: '8.3.24', laravel: '^12.0', testbench: '^10.0' }
-          - { php: '8.4.11', laravel: '^12.0', testbench: '^10.0' }
+          - { php: '8.3.36', laravel: '^12.0', testbench: '^10.0' }
+          - { php: '8.4.27', laravel: '^12.0', testbench: '^10.0' }
           - { php: '8.5.12', laravel: '^12.0', testbench: '^10.0' }
-          - { php: '8.3.24', laravel: '^13.0', testbench: '^11.0' }
-          - { php: '8.4.11', laravel: '^13.0', testbench: '^11.0' }
+          - { php: '8.3.36', laravel: '^13.0', testbench: '^11.0' }
+          - { php: '8.4.27', laravel: '^13.0', testbench: '^11.0' }
           - { php: '8.5.12', laravel: '^13.0', testbench: '^11.0' }
 
     runs-on: ubuntu-latest
